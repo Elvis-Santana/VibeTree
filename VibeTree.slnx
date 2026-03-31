@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="VibeTree.Application/VibeTree.Application.csproj" />
+  <Project Path="VibeTree.Domain/VibeTree.Domain.csproj" />
+  <Project Path="VibeTree.Infrastructure/VibeTree.Infrastructure.csproj" />
+  <Project Path="VibeTree.Test/VibeTree.Test.csproj" />
+  <Project Path="VibeTree/VibeTree.csproj" />
+</Solution>
