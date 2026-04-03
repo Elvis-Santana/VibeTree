@@ -1,8 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using VibeTree.Infrastructure.AppDbContext;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<AppDbContext>(optionsAction =>
+{
+    string connection = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentException();
+    optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
+
+});
 
 var app = builder.Build();
 
