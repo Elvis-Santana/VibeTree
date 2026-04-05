@@ -14,6 +14,8 @@ public class Perfil : EntityBase
 
     public Guid IdUser { get; }
 
+    private Perfil() : base() { }
+
     public Perfil(Guid id, DateTime createdAt, DateTime updatedAt,string cor,string descricao,string imagemUrl,Guid idUser) : base(id, createdAt, updatedAt)
     {
         Cor = cor;

@@ -12,6 +12,7 @@ public abstract class EntityBase
     public DateTime CreatedAt { get;  }
     public DateTime UpdatedAt { get;  }
 
+    protected EntityBase() { }
     public EntityBase(Guid id, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;

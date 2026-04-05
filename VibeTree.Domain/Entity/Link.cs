@@ -18,6 +18,8 @@ public class Link : EntityBase
     public bool Ativo { get; }
 
 
+    private Link() : base() { }
+
     public Link(Guid id, DateTime createdAt, DateTime updatedAt, string linkUrl, string descricao, Guid idUser, int order, bool ativo) : base(id, createdAt, updatedAt)
     {
         LinkUrl = linkUrl;
