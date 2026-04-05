@@ -11,7 +11,11 @@ public class User : EntityBase
     public string Name { get; } 
     public string PasswordHast { get; }
     public string Email { get; }
+    public virtual ICollection<Link> Links { get; }
 
+    private User() : base() { }
+    
+    
     public User
         (Guid id, DateTime createdAt, DateTime updatedAt,string name,string passwordHast,string email) 
         : base(id, createdAt, updatedAt)
