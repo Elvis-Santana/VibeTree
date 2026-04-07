@@ -27,10 +27,11 @@ public class PerfilTest
          Guid id = Guid.NewGuid();
          DateTime createdAt = DateTime.UtcNow;
          DateTime updatedAt = DateTime.UtcNow;
+        string slug = _perfilFaker.Random.String2(10, 30);
 
         //act
 
-        Perfil perfil = new(id, createdAt,updatedAt, cor, descricao, imagemUrl, idUser);
+        Perfil perfil = new(id, createdAt,updatedAt, cor, descricao, imagemUrl, slug, idUser);
 
         //assert
 
