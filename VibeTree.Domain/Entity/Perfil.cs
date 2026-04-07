@@ -12,15 +12,18 @@ public class Perfil : EntityBase
     public string Descricao { get; }
     public string ImagemUrl { get; }
 
+    public string Slug { get; }
+
     public Guid IdUser { get; }
 
     private Perfil() : base() { }
 
-    public Perfil(Guid id, DateTime createdAt, DateTime updatedAt,string cor,string descricao,string imagemUrl,Guid idUser) : base(id, createdAt, updatedAt)
+    public Perfil(Guid id, DateTime createdAt, DateTime updatedAt,string cor,string descricao,string imagemUrl,string slug,Guid idUser) : base(id, createdAt, updatedAt)
     {
         Cor = cor;
         Descricao = descricao;
         ImagemUrl = imagemUrl;
+        Slug = slug;
         IdUser = idUser;
     }
 }
