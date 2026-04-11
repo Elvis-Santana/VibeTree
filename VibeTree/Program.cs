@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction =>
 
 });
 
-builder.Services.AddScoped<ICommandHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
+builder.Services.AddTransient<ICommandHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
 
 var app = builder.Build();
 
