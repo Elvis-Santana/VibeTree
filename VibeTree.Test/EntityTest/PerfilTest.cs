@@ -27,7 +27,7 @@ public class PerfilTest
          Guid id = Guid.NewGuid();
          DateTime createdAt = DateTime.UtcNow;
          DateTime updatedAt = DateTime.UtcNow;
-        string slug = _perfilFaker.Random.String2(10, 30);
+         string slug = _perfilFaker.Random.String2(10, 30);
 
         //act
 
