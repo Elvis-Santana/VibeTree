@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using VibeTree.Application.Interfaces;
 using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.User.CreateUser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction =>
     optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
 
 });
+
+builder.Services.AddScoped<ICommandHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
 
 var app = builder.Build();
 
