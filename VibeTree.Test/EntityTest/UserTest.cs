@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VibeTree.Domain.Entity;
+
 
 namespace VibeTree.Test.EntityTest;
 
@@ -27,7 +27,7 @@ public class UserTest
 
 
         //act
-        User user = new (id, createdAt, updatedAt, name, passwordHash, email);
+        Domain.Entity.User user = new (id, createdAt, updatedAt, name, passwordHash, email);
 
 
         //assert
