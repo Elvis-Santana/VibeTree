@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.User;
+using VibeTree.Application.User.Get;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
 
@@ -17,7 +19,10 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction =>
 
 });
 
-builder.Services.AddTransient<ICommandHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
+builder.Services.AddTransient<IHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
+
+builder.Services.AddTransient<IHandler<GetAllUserQuery, List<UserResponse>>, GetAllUserHandler>();
+
 
 var app = builder.Build();
 
