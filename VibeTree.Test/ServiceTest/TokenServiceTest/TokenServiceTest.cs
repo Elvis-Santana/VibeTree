@@ -30,7 +30,7 @@ public class TokenServiceTest
     [Fact]
     public void Constructor_WithValidConfiguration_DoesNotThrow()
     {
-         var config = BuildConfig();
+        var config = BuildConfig();
 
         Action act = () => new TokenService(config);
 
