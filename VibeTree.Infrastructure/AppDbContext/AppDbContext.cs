@@ -29,7 +29,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>(u =>
         {
             u.HasKey(x => x.Id);
+            u.Property(x => x.Name);
+            u.Property(x => x.PasswordHast);
             u.Property(x => x.Email).IsUnicode();
+
              u.HasMany(x => x.Links)
             .WithOne()
             .HasForeignKey(l => l.IdUser)
