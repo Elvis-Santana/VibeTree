@@ -69,10 +69,10 @@ public class TokenServiceTest
 
 
 
-        var tokem = await service.CriarToken(user);
+        Token tokem = await service.CriarToken(user);
 
 
-        tokem.Should().NotBeNullOrWhiteSpace();
+        tokem.token.Should().NotBeNullOrWhiteSpace();
 
     }
 }
