@@ -25,7 +25,7 @@ public class TokenService : ITokenService
     }
 
 
-    public Task<string> CriarToken(Domain.Entity.User user)
+    public Task<Token> CriarToken(Domain.Entity.User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -46,6 +46,6 @@ public class TokenService : ITokenService
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
-        return Task.FromResult(tokenHandler.WriteToken(token));
+        return Task.FromResult(new Token(tokenHandler.WriteToken(token)));
     }
 }
