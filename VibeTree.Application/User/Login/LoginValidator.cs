@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VibeTree.Application.Result;
 using VibeTree.Domain.Entity;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -13,12 +14,15 @@ public class LoginValidator :AbstractValidator<LoginQuery>
 {
     public LoginValidator()
     {
-        RuleFor(x => x.email)
-            .NotEmpty().WithMessage("email não pode ser vazio")
-            .EmailAddress().WithMessage("Formato de email inválido.");
 
-        RuleFor(x => x.password).NotEmpty().WithMessage("password não pode ser vazio")
-            .MinimumLength(6).WithMessage("password deve conter no mínimo 6 caracteres.");
+
+        RuleFor(x => x.email)
+            .NotEmpty().WithMessage(Error.EmailEmpty.Message)
+            .EmailAddress().WithMessage(Error.EmailAddress.Message);
+
+        RuleFor(x => x.password)
+            .NotEmpty().WithMessage(Error.PasswordEmpty.Message)
+            .MinimumLength(6).WithMessage(Error.PasswordMinimumLength.Message);
     }
 
   
