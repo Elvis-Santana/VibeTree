@@ -14,15 +14,15 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 
     public CreateUserValidator()
     {
-        RuleFor(x => x.name)
+        RuleFor(x => x.Name)
             .NotEmpty().WithMessage(Error.NameEmpty.Message)
             .MinimumLength(3).WithMessage(Error.NameMinimumLength.Message);
 
-        RuleFor(x => x.email)
+        RuleFor(x => x.Email)
            .NotEmpty().WithMessage(Error.EmailEmpty.Message)
            .EmailAddress().WithMessage(Error.EmailAddress.Message);
 
-        RuleFor(x => x.password)
+        RuleFor(x => x.Password)
             .NotEmpty().WithMessage(Error.PasswordEmpty.Message)
             .MinimumLength(6).WithMessage(Error.PasswordMinimumLength.Message);
     }
