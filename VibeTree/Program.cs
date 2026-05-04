@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using System.Reflection.Metadata;
-using VibeTree.Application.Auth;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Result;
 using VibeTree.Application.User;
-using VibeTree.Application.User.Get;
+using VibeTree.Application.User.Login;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
 
@@ -68,12 +70,6 @@ builder.Services.AddOpenApi(optionsAction =>
 
 builder.Services.ConfigureServicesApplication(builder.Configuration);
 
-builder.Services.AddTransient<IHandler<CreateUserCommand, UserResponse>, CreateUserHandler>();
-
-builder.Services.AddTransient<IHandler<GetAllUserQuery, List<UserResponse>>, GetAllUserHandler>();
-
-builder.Services.AddScoped<ITokenService, TokenService>();
-
 
 var app = builder.Build();
 
@@ -85,28 +81,43 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthentication();
+//app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
+
+
+app.MapPost("/user/create",
+    async([FromServices] IHandler<CreateUserCommand, Userlogin> handler,
+    [FromBody] CreateUserCommand createUserCommand) =>{
+
+    Userlogin result = await handler.HandleAsync(createUserCommand);
+
+   return Results.Ok(result);
+});
+
+app.MapGet("/auth/login",
+ async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
+    [FromBody] LoginQuery loginQuery) =>
+ {
+
+     Result<Userlogin> result = await handler.HandleAsync(loginQuery);
+
+     if (!result.IsSuccess)
+     {
+         return Results.NotFound(result.Error);
+     }
+
+     return Results.Ok(result.Value);
+
+ });
+
+
+app.MapGet("auth/me", async (HttpContext httpContext) =>
 {
-var forecast = Enumerable.Range(1, 5).Select(index =>
-    new WeatherForecast
-    (
-        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-        Random.Shared.Next(-20, 55),
-        summaries[Random.Shared.Next(summaries.Length)]
-    ))
-    .ToArray();
-return forecast;
-})
-.WithName("GetWeatherForecast");
+    return Results.Ok(true);
+
+}).RequireAuthorization();
+
 
 app.Run();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
