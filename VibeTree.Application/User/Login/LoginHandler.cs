@@ -32,11 +32,12 @@ public class LoginHandler(
 
         Domain.Entity.User? user = await this._appDbContext
             .Users
-            .FirstOrDefaultAsync(u => u.Email.Equals(query.email));
-
+            .Where(u => u.Email.Equals(query.email))
+            .FirstOrDefaultAsync();
 
         if (user is null || !(BCryptNet.Verify(query.password, user?.PasswordHash)))
             return Error.InvalidCredentials;
+
 
         Token token = await this._tokenService.CriarToken(user!);
 
