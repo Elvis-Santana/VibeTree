@@ -1,6 +1,19 @@
-@VibeTree_HostAddress = http://localhost:5199
+@VibeTree_HostAddress = https://localhost:7115
 
-GET {{VibeTree_HostAddress}}/weatherforecast/
-Accept: application/json
+
+POST {{VibeTree_HostAddress}}/user/create
+Content-Type: application/json
+{
+     name:"Elvis",
+     password:"elvis0130",
+     email:"elvis@gmail.com"
+}
 
 ###
+
+GET {{VibeTree_HostAddress}}/auth/login
+Content-Type: application/json
+{
+    "password":"elvis0130",
+    "email":"elvissantanaguimaraes@gmail.com"
+}
