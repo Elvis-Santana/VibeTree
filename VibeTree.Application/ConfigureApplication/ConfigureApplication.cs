@@ -39,11 +39,12 @@ public static class ConfigureApplication
             });
 
         services.AddScoped<ITokenService, TokenService>();
-        services.AddTransient<IHandler<CreateUserCommand, Userlogin>, CreateUserHandler>();
+        services.AddTransient<IHandler<CreateUserCommand, Result<Userlogin>>, CreateUserHandler>();
         services.AddTransient<IHandler<GetAllUserQuery, List<Userlogin>>, GetAllUserHandler>();
         services.AddTransient<IHandler<LoginQuery, Result<Userlogin>>, LoginHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
+        services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
 
 
 
