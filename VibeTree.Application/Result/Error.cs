@@ -11,6 +11,9 @@ public  record struct Error(string Message)
     public  static Error NameEmpty = 
         new ("o nome não pode ser vazio");
 
+    public static Error NameMinimumLength = 
+        new ("o nome deve conter no mínimo 3 caracteres");
+
     public static Error EmailEmpty = 
         new ("email não pode ser vazio");
 
@@ -26,6 +29,7 @@ public  record struct Error(string Message)
 
     public static Error InvalidCredentials =
         new("Credenciais inválidas");
+
 
 
 }
