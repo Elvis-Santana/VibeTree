@@ -15,22 +15,12 @@ public class TokenServiceTest
 {
     private readonly Faker _userFaker = new("pt_BR");
 
-    private IConfiguration BuildConfig(string secret = "chave_de_teste_muito_longa_e_secreta_12345")
-    {
-        var inMemorySettings = new Dictionary<string, string>
-        {
-            {"JwtSettings:secret_key", secret}
-        };
-
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(inMemorySettings)
-            .Build();
-    }
+ 
 
     [Fact]
     public void Constructor_WithValidConfiguration_DoesNotThrow()
     {
-        var config = BuildConfig();
+        var config = JwtBuildConfig.BuildConfig();
 
         Action act = () => new TokenService(config);
 
@@ -55,7 +45,7 @@ public class TokenServiceTest
     public async Task CriarToken_Should_RetornarToken()
     {
 
-        var config = BuildConfig();
+        var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
         var user = new Domain.Entity.User(
