@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
         {
             u.HasKey(x => x.Id);
             u.Property(x => x.Name);
-            u.Property(x => x.PasswordHast);
+            u.Property(x => x.PasswordHash).HasMaxLength(255);
             u.Property(x => x.Email).IsUnicode();
 
              u.HasMany(x => x.Links)
