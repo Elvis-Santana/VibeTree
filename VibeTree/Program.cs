@@ -86,26 +86,29 @@ app.UseAuthentication();
 
 
 
-app.MapPost("/user/create",
-    async([FromServices] IHandler<CreateUserCommand, Userlogin> handler,
+app.MapPost("/user/create",async([FromServices] IHandler<CreateUserCommand, Result<Userlogin>> handler,
     [FromBody] CreateUserCommand createUserCommand) =>{
 
-    Userlogin result = await handler.HandleAsync(createUserCommand);
+    Result<Userlogin> result = await handler.HandleAsync(createUserCommand);
 
-   return Results.Ok(result);
+    if (!result.IsSuccess)
+            return Results.BadRequest(result.Error);
+    
+
+   return Results.Created($"user/{result.Value.Id}",result.Value);
 });
 
-app.MapGet("/auth/login",
- async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
+
+
+app.MapGet("/auth/login",async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
     [FromBody] LoginQuery loginQuery) =>
  {
 
      Result<Userlogin> result = await handler.HandleAsync(loginQuery);
 
      if (!result.IsSuccess)
-     {
          return Results.NotFound(result.Error);
-     }
+     
 
      return Results.Ok(result.Value);
 
