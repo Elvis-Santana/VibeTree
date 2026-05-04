@@ -34,7 +34,7 @@ public class UserTest
 
         user.Id.Should().Be(id);
         user.Name.Should().Be(name);
-        user.PasswordHast.Should().Be(passwordHash);
+        user.PasswordHash.Should().Be(passwordHash);
         user.Email.Should().Be(email);
         user.CreatedAt.Should().Be(createdAt);
         user.UpdatedAt.Should().Be(updatedAt);
