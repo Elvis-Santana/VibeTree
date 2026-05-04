@@ -9,7 +9,7 @@ namespace VibeTree.Domain.Entity;
 public class User : EntityBase
 {
     public string Name { get; } 
-    public string PasswordHast { get; }
+    public string PasswordHash { get; }
     public string Email { get; }
     public virtual ICollection<Link> Links { get; }
 
@@ -17,11 +17,11 @@ public class User : EntityBase
     
     
     public User
-        (Guid id, DateTime createdAt, DateTime updatedAt,string name,string passwordHast,string email) 
+        (Guid id, DateTime createdAt, DateTime updatedAt,string name,string passwordHash,string email) 
         : base(id, createdAt, updatedAt)
     {
         Name = name;
-        PasswordHast = passwordHast;
+        PasswordHash = passwordHash;
         Email = email;
     }
 }
