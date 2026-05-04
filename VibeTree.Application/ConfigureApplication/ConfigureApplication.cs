@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using VibeTree.Application.Auth;
+using VibeTree.Application.Interfaces;
+using VibeTree.Application.User;
+using VibeTree.Application.User.Get;
+using VibeTree.Application.User.Login;
+using VibeTree.User.CreateUser;
 
 namespace VibeTree.Application.ConfigureApplication;
 
@@ -33,6 +36,14 @@ public static class ConfigureApplication
                     IssuerSigningKey = secretKey
                 };
             });
+
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddTransient<IHandler<CreateUserCommand, Userlogin>, CreateUserHandler>();
+        services.AddTransient<IHandler<GetAllUserQuery, List<Userlogin>>, GetAllUserHandler>();
+        services.AddTransient<IHandler<LoginQuery, Userlogin>, LoginHandler>();
+
+        services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
+
 
 
 
