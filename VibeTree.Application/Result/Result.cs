@@ -8,24 +8,19 @@ using System.Threading.Tasks;
 namespace VibeTree.Application.Result;
 
 
-public record Result(bool isSuccess, List<Error>? error = default)
+public record  Result(bool IsSuccess, List<Error>? Errors = default)
 {
-    public List<Error>? Error { get; set; } = error;
-
-    public bool IsSuccess => isSuccess;
     public static Result Success() => new Result(true, null);
 
-    public static Result Failure(List<Error> error) => new Result(false, error);
+    public static Result Failure(List<Error> errors) => new Result(false, errors);
+
     public static Result Failure(Error error) => new Result(false, new List<Error>() { error });
 
     public static implicit operator Result(List<Error> error) => Failure(error);
-
     public static implicit operator Result(Error error) => Failure(error);
-
-
 }
 
-public record Result<T>: Result
+public record  Result<T>: Result
 {
     public T Value { get; } = default!;
 
