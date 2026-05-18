@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Perfil;
+using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Get;
@@ -44,6 +46,9 @@ public static class ConfigureApplication
         services.AddTransient<IHandler<CreateUserCommand, Result<Userlogin>>, CreateUserHandler>();
         services.AddTransient<IHandler<GetAllUserQuery, List<Userlogin>>, GetAllUserHandler>();
         services.AddTransient<IHandler<LoginQuery, Result<Userlogin>>, LoginHandler>();
+        services.AddTransient<IHandler<
+            CreatePerfilCommand, Result<PerfilResponse>>, 
+            CreatePerfilHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
