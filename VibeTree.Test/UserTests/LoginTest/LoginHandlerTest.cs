@@ -64,7 +64,7 @@ public class LoginHandlerTest
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
         result.Value.Email.Should().Be(loginQuerie.email);
-        result.isSuccess.Should().BeTrue();
+        result.IsSuccess.Should().BeTrue();
         result.Value.Token.Should().NotBeNullOrWhiteSpace();
 
     }
@@ -102,7 +102,7 @@ public class LoginHandlerTest
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().NotBeEmpty();
+        result.Errors.Should().NotBeEmpty();
 
     }
 
@@ -136,7 +136,7 @@ public class LoginHandlerTest
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().NotBeEmpty();
+        result.Errors.Should().NotBeEmpty();
 
     }
 }

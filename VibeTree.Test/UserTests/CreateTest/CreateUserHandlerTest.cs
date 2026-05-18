@@ -70,14 +70,14 @@ public class CreateUserHandlerTest
         result.Should().NotBeNull();
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Contains(Error.EmailAddress).Should().BeTrue();
-        result.Error.Contains(Error.EmailEmpty).Should().BeTrue();
+        result.Errors.Contains(Error.EmailAddress).Should().BeTrue();
+        result.Errors.Contains(Error.EmailEmpty).Should().BeTrue();
 
-        result.Error.Contains(Error.NameMinimumLength).Should().BeTrue();
-        result.Error.Contains(Error.NameEmpty).Should().BeTrue();
+        result.Errors.Contains(Error.NameMinimumLength).Should().BeTrue();
+        result.Errors.Contains(Error.NameEmpty).Should().BeTrue();
 
-        result.Error.Contains(Error.PasswordEmpty).Should().BeTrue();
-        result.Error.Contains(Error.PasswordMinimumLength).Should().BeTrue();
+        result.Errors.Contains(Error.PasswordEmpty).Should().BeTrue();
+        result.Errors.Contains(Error.PasswordMinimumLength).Should().BeTrue();
 
 
     }
