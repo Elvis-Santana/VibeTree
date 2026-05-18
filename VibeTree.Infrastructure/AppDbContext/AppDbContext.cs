@@ -17,15 +17,14 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get;  set; }
     public  DbSet<Link> Links { get;  set; }
+    public DbSet<Perfil> perfils { get; set; }
 
 
    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Link>()
-           .HasKey(l => l.Id);
-
-
+          .HasKey(l => l.Id);
         modelBuilder.Entity<User>(u =>
         {
             u.HasKey(x => x.Id);
@@ -37,6 +36,24 @@ public class AppDbContext : DbContext
             .WithOne()
             .HasForeignKey(l => l.IdUser)
             .OnDelete(DeleteBehavior.Cascade);
+
+        });
+
+          
+
+        modelBuilder.Entity<Perfil>(p =>
+        {
+            p.HasKey(x => x.Id);
+            p.Property(x => x.Descricao).HasMaxLength(255);
+            p.Property(x => x.Slug).HasMaxLength(255);
+            p.Property(x => x.ImagemUrl);
+            p.Property(x => x.Cor);
+
+            p.HasOne<User>()
+            .WithOne()
+            .HasForeignKey<Perfil>(x => x.IdUser)
+            .OnDelete(DeleteBehavior.Cascade);
+
 
         });
             
