@@ -18,20 +18,15 @@ namespace VibeTree.Test.UserTests.CreateUserTest;
 public class CreateUserHandlerTest
 {
 
-    private readonly AppDbContext _context;
-
-    public CreateUserHandlerTest()
-    {
-        var option = new DbContextOptionsBuilder<AppDbContext>()
-              .UseInMemoryDatabase(new Guid().ToString())
-              .Options;
-
-        _context = new(option);
-    }
+  
 
     [Fact]
     public async Task CreateUserHandler_Should_Create_User()
     {
+
+        await using var db = new DbContextBuildConfig();
+        await using var context = await db.CriarContextoPreparadoAsync();
+
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
@@ -40,7 +35,7 @@ public class CreateUserHandlerTest
         new(f.Person.FullName, BCrypt.Net.BCrypt.HashPassword(f.Internet.Password()), f.Person.Email));
 
         CreateUserCommand user = faker.Generate();
-        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(_context, service, new CreateUserValidator());
+        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(context, service, new CreateUserValidator());
 
 
         Result<Userlogin> result = await commandHandler.HandleAsync(user);
@@ -59,12 +54,15 @@ public class CreateUserHandlerTest
     [Fact]
     public async Task CreateUserHandler_Should_Return_Error_When_Invalid_Data()
     {
+        await using var db = new DbContextBuildConfig();
+        await using var context = await db.CriarContextoPreparadoAsync();
+
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
         CreateUserCommand user = new(string.Empty, string.Empty, string.Empty);
 
-        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(_context, service, new CreateUserValidator());
+        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(context, service, new CreateUserValidator());
 
         Result<Userlogin> result = await commandHandler.HandleAsync(user);
         result.Should().NotBeNull();

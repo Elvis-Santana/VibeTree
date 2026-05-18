@@ -19,16 +19,8 @@ namespace VibeTree.Test.UserTests.LoginTest;
 
 public class LoginHandlerTest
 {
-    private readonly AppDbContext _context;
 
-    public LoginHandlerTest()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-
-        _context = new AppDbContext(options);
-    }
+  
 
     [Fact]
     public async Task LoginHandler_Should_Return_Userlogin()
@@ -36,9 +28,10 @@ public class LoginHandlerTest
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
+        await using var db = new DbContextBuildConfig();
+        await using var context = await db.CriarContextoPreparadoAsync();
+
         string password = new Faker("pt_BR").Internet.Password();
-
-
 
         var userFaker = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f => new Domain.Entity.User(
@@ -52,14 +45,14 @@ public class LoginHandlerTest
 
         var users = userFaker.Generate();
 
-        _context.Users.AddRange(users);
-        await _context.SaveChangesAsync();
+        await context.Users.AddAsync(users);
+        await context.SaveChangesAsync();
 
-        var loginQuerie = _context.Users.Select(u => new LoginQuery(password, u.Email)).First();
+        var loginQuerie = context.Users.Select(u => new LoginQuery(password, u.Email)).First();
 
 
         IHandler<LoginQuery, Result<Userlogin>> queryHandler =
-            new LoginHandler(_context, service, new LoginValidator());
+            new LoginHandler(context, service, new LoginValidator());
 
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
@@ -75,6 +68,9 @@ public class LoginHandlerTest
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
+        await using var db = new DbContextBuildConfig();
+        await using var context = await db.CriarContextoPreparadoAsync();
+
         string password = new Faker("pt_BR").Internet.Password();
 
         var userFaker = new Faker<Domain.Entity.User>("pt_BR")
@@ -89,8 +85,8 @@ public class LoginHandlerTest
 
         var users = userFaker.Generate();
 
-        _context.Users.AddRange(users);
-        await _context.SaveChangesAsync();
+        context.Users.AddRange(users);
+        await context.SaveChangesAsync();
 
         var loginQuerie = new Faker<LoginQuery>("pt_BR")
             .CustomInstantiator(f => new LoginQuery(
@@ -98,7 +94,7 @@ public class LoginHandlerTest
                 f.Internet.Email()
             )).Generate();
 
-        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(_context, service, new LoginValidator());
+        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(context, service, new LoginValidator());
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
@@ -113,6 +109,9 @@ public class LoginHandlerTest
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
+        await using var db = new DbContextBuildConfig();
+        await using var context = await db.CriarContextoPreparadoAsync();
+
         string password = new Faker("pt_BR").Internet.Password();
 
         var userFaker = new Faker<Domain.Entity.User>("pt_BR")
@@ -127,12 +126,12 @@ public class LoginHandlerTest
 
         var users = userFaker.Generate();
 
-        _context.Users.AddRange(users);
-        await _context.SaveChangesAsync();
+        context.Users.AddRange(users);
+        await context.SaveChangesAsync();
 
         var loginQuerie = new LoginQuery(string.Empty, string.Empty);
 
-        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(_context, service, new LoginValidator());
+        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(context, service, new LoginValidator());
         Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
