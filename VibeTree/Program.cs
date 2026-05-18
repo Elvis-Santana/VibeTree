@@ -7,11 +7,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Perfil;
+using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction =>
     .GetConnectionString("DefaultConnection") ?? throw new ArgumentException();
 
     optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
+   
 
 });
 
@@ -101,6 +105,20 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+
+app.MapPost("/perfil/create", async (
+    [FromServices] IHandler<CreatePerfilCommand, Result<PerfilResponse>> handler,
+     [FromBody] CreatePerfilCommand command) =>
+{
+
+    Result<PerfilResponse> result = await handler.HandleAsync(command);
+
+    if (!result.IsSuccess)
+        return Results.BadRequest(result);
+
+
+    return Results.Ok(result);
+});
 
 app.MapPost("/user/create", async ([FromServices] IHandler<CreateUserCommand, Result<Userlogin>> handler,
     [FromBody] CreateUserCommand createUserCommand) => {
