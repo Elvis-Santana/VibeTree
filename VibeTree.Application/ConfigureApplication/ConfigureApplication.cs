@@ -23,12 +23,12 @@ public static class ConfigureApplication
         var jwt = configuration.GetSection("JwtSettings");
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["secret_key"]));
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication("Bearer")
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
+                    ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
@@ -37,6 +37,8 @@ public static class ConfigureApplication
                     IssuerSigningKey = secretKey
                 };
             });
+
+        services.AddAuthorization();
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddTransient<IHandler<CreateUserCommand, Result<Userlogin>>, CreateUserHandler>();
