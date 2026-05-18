@@ -70,6 +70,18 @@ builder.Services.AddOpenApi(optionsAction =>
 
 builder.Services.ConfigureServicesApplication(builder.Configuration);
 
+const string policy = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(op =>
+{
+    op.AddPolicy(policy, (x) =>
+    {
+        x.AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin();
+
+    });
+});
 
 var app = builder.Build();
 
@@ -79,47 +91,51 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseRouting();
+
+app.UseCors(policy);
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-//app.UseAuthorization();
+
+app.UseAuthorization();
 
 
 
-app.MapPost("/user/create",async([FromServices] IHandler<CreateUserCommand, Result<Userlogin>> handler,
-    [FromBody] CreateUserCommand createUserCommand) =>{
+app.MapPost("/user/create", async ([FromServices] IHandler<CreateUserCommand, Result<Userlogin>> handler,
+    [FromBody] CreateUserCommand createUserCommand) => {
 
-    Result<Userlogin> result = await handler.HandleAsync(createUserCommand);
+        Result<Userlogin> result = await handler.HandleAsync(createUserCommand);
+
+        if (!result.IsSuccess)
+            return Results.BadRequest(result);
+
+
+        return Results.Ok(result);
+    });
+
+
+
+app.MapPost("/auth/login", async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
+    [FromBody] LoginQuery loginQuery) =>
+{
+
+    Result<Userlogin> result = await handler.HandleAsync(loginQuery);
 
     if (!result.IsSuccess)
-            return Results.BadRequest(result.Error);
-    
+        return Results.NotFound(result);
 
-   return Results.Created($"user/{result.Value.Id}",result.Value);
+
+    return Results.Ok(result);
+
 });
 
-
-
-app.MapGet("/auth/login",async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
-    [FromBody] LoginQuery loginQuery) =>
- {
-
-     Result<Userlogin> result = await handler.HandleAsync(loginQuery);
-
-     if (!result.IsSuccess)
-         return Results.NotFound(result.Error);
-     
-
-     return Results.Ok(result.Value);
-
- });
-
-
-app.MapGet("auth/me", async (HttpContext httpContext) =>
+app.MapGet("auth/me", async() =>
 {
-    return Results.Ok(true);
+    return Results.Ok(new { valid=true });
+}).RequireAuthorization(); 
 
-}).RequireAuthorization();
+
 
 
 app.Run();
