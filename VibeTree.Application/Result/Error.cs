@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VibeTree.Application.Result;
 
-public  record struct Error(string Message)
+public  record  Error(string Message)
 {
     public  static Error NameEmpty = 
         new ("o nome não pode ser vazio");
