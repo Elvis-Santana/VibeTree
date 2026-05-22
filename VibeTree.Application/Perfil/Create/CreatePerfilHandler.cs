@@ -9,9 +9,11 @@ using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Application.Perfil.Create;
 
-public class CreatePerfilHandler(AppDbContext appDbContext) : IHandler<CreatePerfilCommand, Result<PerfilResponse>>
+public class CreatePerfilHandler(AppDbContext appDbContext) : IHandler<CreatePerfilCommand, PerfilResponse>
 {
     private readonly AppDbContext _appDbContext = appDbContext;
+
+
     public async Task<Result<PerfilResponse>> HandleAsync(CreatePerfilCommand command)
     {
 
@@ -28,7 +30,7 @@ public class CreatePerfilHandler(AppDbContext appDbContext) : IHandler<CreatePer
 
         await _appDbContext.perfils.AddAsync(perfil);
         await _appDbContext.SaveChangesAsync();
-       
+
 
         return new PerfilResponse(perfil.Id, perfil.Descricao, perfil.ImagemUrl, perfil.Slug, perfil.IdUser);
 
