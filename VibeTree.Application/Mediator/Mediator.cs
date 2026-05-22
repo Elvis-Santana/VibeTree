@@ -13,13 +13,12 @@ namespace VibeTree.Application.Mediator;
 
 public sealed class Mediator (IServiceProvider provider) : IMediator
 {
-    public async Task<Result.Result<IResponse>> SendAync<IResponse>(IRequest<IResponse> request)
+    public async Task<Result.Result<IResponse>> SendAsync<IResponse>(IRequest<IResponse> request) 
     {
 
-        
         Type type = request.GetType();
 
-        var handlerType = typeof(IHandler<,>).MakeGenericType(type, typeof(IResponse));
+        Type handlerType = typeof(IHandler<,>).MakeGenericType(type, typeof(IResponse));
 
         dynamic handler = provider.GetRequiredService(handlerType);
 

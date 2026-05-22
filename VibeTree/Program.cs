@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System;
@@ -7,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
@@ -14,7 +16,6 @@ using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
-using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -107,11 +108,11 @@ app.UseAuthorization();
 
 
 app.MapPost("/perfil/create", async (
-    [FromServices] IHandler<CreatePerfilCommand, Result<PerfilResponse>> handler,
+    [FromServices] IMediator mediator,
      [FromBody] CreatePerfilCommand command) =>
 {
 
-    Result<PerfilResponse> result = await handler.HandleAsync(command);
+    Result<PerfilResponse> result = await mediator.SendAsync(command);
 
     if (!result.IsSuccess)
         return Results.BadRequest(result);
@@ -120,10 +121,10 @@ app.MapPost("/perfil/create", async (
     return Results.Ok(result);
 });
 
-app.MapPost("/user/create", async ([FromServices] IHandler<CreateUserCommand, Result<Userlogin>> handler,
+app.MapPost("/user/create", async ([FromServices] IMediator mediator,
     [FromBody] CreateUserCommand createUserCommand) => {
 
-        Result<Userlogin> result = await handler.HandleAsync(createUserCommand);
+        Result<Userlogin> result = await mediator.SendAsync(createUserCommand);
 
         if (!result.IsSuccess)
             return Results.BadRequest(result);
@@ -133,12 +134,9 @@ app.MapPost("/user/create", async ([FromServices] IHandler<CreateUserCommand, Re
     });
 
 
+app.MapPost("/auth/login", async ([FromServices] IMediator mediator,[FromBody] LoginQuery loginQuery) => {
 
-app.MapPost("/auth/login", async ([FromServices] IHandler<LoginQuery, Result<Userlogin>> handler,
-    [FromBody] LoginQuery loginQuery) =>
-{
-
-    Result<Userlogin> result = await handler.HandleAsync(loginQuery);
+    var result = await mediator.SendAsync(loginQuery);
 
     if (!result.IsSuccess)
         return Results.NotFound(result);
@@ -148,10 +146,7 @@ app.MapPost("/auth/login", async ([FromServices] IHandler<LoginQuery, Result<Use
 
 });
 
-app.MapGet("auth/me", async() =>
-{
-    return Results.Ok(new { valid=true });
-}).RequireAuthorization(); 
+app.MapGet("auth/me", async() => Results.Ok(new { valid=true })).RequireAuthorization(); 
 
 
 
