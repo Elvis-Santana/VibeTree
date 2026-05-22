@@ -54,7 +54,7 @@ public class LoginHandlerTest
 
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
 
-        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
+        Result<Userlogin> result = await mediator.SendAsync(loginQuerie);
 
         result.Value.Email.Should().Be(loginQuerie.email);
         result.IsSuccess.Should().BeTrue();
@@ -93,7 +93,7 @@ public class LoginHandlerTest
 
 
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
-        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
+        Result<Userlogin> result = await mediator.SendAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();
@@ -131,7 +131,7 @@ public class LoginHandlerTest
 
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
 
-        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
+        Result<Userlogin> result = await mediator.SendAsync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();

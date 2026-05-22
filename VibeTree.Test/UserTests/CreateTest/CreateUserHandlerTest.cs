@@ -43,7 +43,7 @@ public class CreateUserHandlerTest
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
 
 
-        Result<Userlogin> result = await mediator.SendAync(user);
+        Result<Userlogin> result = await mediator.SendAsync(user);
 
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
@@ -70,7 +70,7 @@ public class CreateUserHandlerTest
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
 
 
-        Result<Userlogin> result = await mediator.SendAync(user);
+        Result<Userlogin> result = await mediator.SendAsync(user);
         result.Should().NotBeNull();
 
         result.IsSuccess.Should().BeFalse();
