@@ -9,6 +9,7 @@ using VibeTree.Application.Interfaces;
 using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
+using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Get;
@@ -50,6 +51,7 @@ public static class ConfigureApplication
         services.AddTransient<IHandler<LoginQuery, Userlogin>, LoginHandler>();
 
         services.AddTransient<IHandler<CreatePerfilCommand,PerfilResponse>,  CreatePerfilHandler>();
+        services.AddTransient<IHandler<GetPerfilByIdQuery, PerfilResponse>, GetPerfilByIdHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreatePerfilCommand>, CreatePerfilValidator>();
