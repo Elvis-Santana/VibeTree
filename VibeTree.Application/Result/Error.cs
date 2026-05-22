@@ -30,6 +30,13 @@ public  record  Error(string Message)
     public static Error InvalidCredentials =
         new("Credenciais inválidas");
 
+    public static Error CorEmpty = new("cor não pode ser vazio");
+
+    public static Error SlugEmpty = new("Slug não pode ser vazio");
+
+    public static Error IdUserEmpty = new("IdUser não pode ser vazio");
+
+
 
 
 }
