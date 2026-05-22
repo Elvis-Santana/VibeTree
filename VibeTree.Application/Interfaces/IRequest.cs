@@ -6,4 +6,4 @@ using System.Threading.Tasks;
 
 namespace VibeTree.Application.Interfaces;
 
-public interface IResquest<T>{}
+public interface IRequest<T>{}

@@ -8,9 +8,9 @@ using VibeTree.Application.User.Get;
 
 namespace VibeTree.Application.Interfaces;
 
-public interface IHandler<in TResquest, TResponse>  where TResquest : IResquest<TResponse>
+public interface IHandler<in TRequest, TResponse>  where TRequest : IRequest<TResponse>
 {
-     Task<Result<TResponse>> HandleAsync(TResquest command);
+     Task<Result<TResponse>> HandleAsync(TRequest command);
 }
 public interface IHandler <TResponse>
 {

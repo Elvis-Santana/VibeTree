@@ -9,7 +9,7 @@ using VibeTree.Application.User;
 
 namespace VibeTree.User.CreateUser;
 
-public record class CreateUserCommand(string Name,string Password,string Email) :IResquest<Userlogin>;
+public record class CreateUserCommand(string Name,string Password,string Email) :IRequest<Userlogin>;
 
 
 

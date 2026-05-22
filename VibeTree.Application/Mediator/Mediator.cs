@@ -13,7 +13,7 @@ namespace VibeTree.Application.Mediator;
 
 public sealed class Mediator (IServiceProvider provider) : IMediator
 {
-    public async Task<Result.Result<IResponse>> SendAync<IResponse>(IResquest<IResponse> request)
+    public async Task<Result.Result<IResponse>> SendAync<IResponse>(IRequest<IResponse> request)
     {
 
         

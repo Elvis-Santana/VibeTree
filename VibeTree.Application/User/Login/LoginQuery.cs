@@ -8,5 +8,5 @@ using VibeTree.Application.Result;
 
 namespace VibeTree.Application.User.Login;
 
-public record LoginQuery(string password, string email):IResquest<Userlogin>;
+public record LoginQuery(string password, string email):IRequest<Userlogin>;
 

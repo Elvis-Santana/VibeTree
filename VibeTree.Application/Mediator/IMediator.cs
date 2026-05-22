@@ -10,5 +10,5 @@ namespace VibeTree.Application.Mediator;
 
 public interface IMediator
 {
-    public Task<Result<IResponse>> SendAync<IResponse>(IResquest<IResponse> resquest);
+    public Task<Result<IResponse>> SendAync<IResponse>(IRequest<IResponse> resquest);
 }
