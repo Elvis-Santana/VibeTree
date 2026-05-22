@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
@@ -13,7 +14,6 @@ using VibeTree.Application.User;
 using VibeTree.Application.User.Get;
 using VibeTree.Application.User.Login;
 using VibeTree.User.CreateUser;
-
 namespace VibeTree.Application.ConfigureApplication;
 
 public static class ConfigureApplication
@@ -42,19 +42,22 @@ public static class ConfigureApplication
 
         services.AddAuthorization();
 
+      
+
         services.AddScoped<ITokenService, TokenService>();
-        services.AddTransient<IHandler<CreateUserCommand, Result<Userlogin>>, CreateUserHandler>();
-        services.AddTransient<IHandler<GetAllUserQuery, List<Userlogin>>, GetAllUserHandler>();
-        services.AddTransient<IHandler<LoginQuery, Result<Userlogin>>, LoginHandler>();
-        services.AddTransient<IHandler<
-            CreatePerfilCommand, Result<PerfilResponse>>, 
-            CreatePerfilHandler>();
+        services.AddTransient<IHandler<CreateUserCommand, Userlogin>, CreateUserHandler>();
+        //services.AddTransient<IHandler<GetAllUserQuery, List<Userlogin>>, GetAllUserHandler>();
+        services.AddTransient<IHandler<LoginQuery, Userlogin>, LoginHandler>();
+
+        services.AddTransient<IHandler<CreatePerfilCommand,PerfilResponse>,  CreatePerfilHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
+        services.AddScoped<IMediator, Mediator.Mediator>();
 
 
 
 
     }
 }
+
