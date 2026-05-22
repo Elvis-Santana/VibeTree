@@ -9,6 +9,6 @@ using VibeTree.Application.User;
 
 namespace VibeTree.Application.Perfil.Create;
 
-public record CreatePerfilCommand(string Cor, string Descricao, string ImagemUrl, string Slug, Guid IdUser): IRequest<PerfilResponse>;
+public record CreatePerfilCommand(string Cor, string Descricao, string ImagemUrl, string Slug, string IdUser): IRequest<PerfilResponse>;
 
 
