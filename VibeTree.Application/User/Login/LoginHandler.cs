@@ -16,7 +16,7 @@ public class LoginHandler(
     AppDbContext appDbContext,
     ITokenService tokenService,
     IValidator<LoginQuery> validator
-    ) : IHandler<LoginQuery, Result<Userlogin>>
+    ) : IHandler<LoginQuery, Userlogin>
 {
     private readonly AppDbContext _appDbContext = appDbContext;
     private readonly IValidator<LoginQuery> _valiator = validator;
