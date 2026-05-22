@@ -52,6 +52,7 @@ public static class ConfigureApplication
         services.AddTransient<IHandler<CreatePerfilCommand,PerfilResponse>,  CreatePerfilHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
+        services.AddScoped<IValidator<CreatePerfilCommand>, CreatePerfilValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
         services.AddScoped<IMediator, Mediator.Mediator>();
 
