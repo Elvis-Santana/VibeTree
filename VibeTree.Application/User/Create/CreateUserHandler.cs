@@ -11,7 +11,7 @@ public class CreateUserHandler (
     AppDbContext appDbContext,
     ITokenService tokenService,
     IValidator<CreateUserCommand> validator
-    ) :IHandler<CreateUserCommand, Result<Userlogin>>
+    ) :IHandler<CreateUserCommand, Userlogin>
 {
     private readonly AppDbContext _appDbContext = appDbContext;
     private readonly ITokenService _tokenService = tokenService;
