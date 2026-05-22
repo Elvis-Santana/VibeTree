@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Mediator;
+using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
@@ -43,18 +46,15 @@ public class LoginHandlerTest
                 f.Internet.Email()
             ));
 
-        var users = userFaker.Generate();
-
+        Domain.Entity.User users = userFaker.Generate();
         await context.Users.AddAsync(users);
         await context.SaveChangesAsync();
 
-        var loginQuerie = context.Users.Select(u => new LoginQuery(password, u.Email)).First();
+        LoginQuery loginQuerie = context.Users.Select(u => new LoginQuery(password, u.Email)).First();
 
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
 
-        IHandler<LoginQuery, Result<Userlogin>> queryHandler =
-            new LoginHandler(context, service, new LoginValidator());
-
-        Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
+        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
 
         result.Value.Email.Should().Be(loginQuerie.email);
         result.IsSuccess.Should().BeTrue();
@@ -70,9 +70,7 @@ public class LoginHandlerTest
 
         await using var db = new DbContextBuildConfig();
         await using var context = await db.CriarContextoPreparadoAsync();
-
         string password = new Faker("pt_BR").Internet.Password();
-
         var userFaker = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f => new Domain.Entity.User(
                 Guid.NewGuid(),
@@ -84,7 +82,6 @@ public class LoginHandlerTest
             ));
 
         var users = userFaker.Generate();
-
         context.Users.AddRange(users);
         await context.SaveChangesAsync();
 
@@ -94,8 +91,9 @@ public class LoginHandlerTest
                 f.Internet.Email()
             )).Generate();
 
-        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(context, service, new LoginValidator());
-        Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
+
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
+        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();
@@ -108,7 +106,6 @@ public class LoginHandlerTest
     {
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
-
         await using var db = new DbContextBuildConfig();
         await using var context = await db.CriarContextoPreparadoAsync();
 
@@ -131,8 +128,10 @@ public class LoginHandlerTest
 
         var loginQuerie = new LoginQuery(string.Empty, string.Empty);
 
-        IHandler<LoginQuery, Result<Userlogin>> queryHandler = new LoginHandler(context, service, new LoginValidator());
-        Result<Userlogin> result = await queryHandler.HandleAsync(loginQuerie);
+
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new LoginHandler(context, service, new LoginValidator()));
+
+        Result<Userlogin> result = await mediator.SendAync(loginQuerie);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();

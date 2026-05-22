@@ -2,13 +2,17 @@
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
+using VibeTree.Application.User;
 using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.User.CreateUser;
 
 namespace VibeTree.Test.PerfilTest.CreateTest;
 
@@ -37,14 +41,18 @@ public class CreatePerfilHandlerTest
         await context.Users.AddAsync( user );
         await context.SaveChangesAsync();
 
-        IHandler<CreatePerfilCommand, Result<PerfilResponse>> commandHandler =
-            new CreatePerfilHandler(context);
 
        var createPerfilCommand = new Faker<CreatePerfilCommand>("pt_BR")
             .CustomInstantiator(f =>
             new(f.Internet.Color(), f.Lorem.Text(), f.Image.LoremFlickrUrl(), f.Internet.Url(), user.Id)).Generate();
+      
 
-        var result = await commandHandler.HandleAsync(createPerfilCommand);
+        IMediator mediator  = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context));
+
+
+
+
+        var result = await mediator.SendAync(createPerfilCommand);
 
 
         result.IsSuccess.Should().BeTrue();
@@ -77,7 +85,7 @@ public class CreatePerfilHandlerTest
         await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
 
-        IHandler<CreatePerfilCommand, Result<PerfilResponse>> commandHandler =
+        IHandler<CreatePerfilCommand, PerfilResponse> commandHandler =
             new CreatePerfilHandler(context);
 
         var createPerfilCommand = new Faker<CreatePerfilCommand>("pt_BR")
@@ -89,8 +97,11 @@ public class CreatePerfilHandlerTest
                  f.Internet.Url(),
                  Guid.NewGuid())).Generate();
 
-        await commandHandler.Invoking(
-            ch => ch.HandleAsync(createPerfilCommand)
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context));
+
+
+        await mediator.Invoking(
+            ch => ch.SendAync(createPerfilCommand)
             ).Should().ThrowAsync<DbUpdateException>();
 
     }

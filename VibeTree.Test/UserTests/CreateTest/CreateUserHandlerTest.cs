@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Mediator;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
+using VibeTree.Application.User.Login;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
 namespace VibeTree.Test.UserTests.CreateUserTest;
@@ -35,10 +38,12 @@ public class CreateUserHandlerTest
         new(f.Person.FullName, BCrypt.Net.BCrypt.HashPassword(f.Internet.Password()), f.Person.Email));
 
         CreateUserCommand user = faker.Generate();
-        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(context, service, new CreateUserValidator());
+
+    
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
 
 
-        Result<Userlogin> result = await commandHandler.HandleAsync(user);
+        Result<Userlogin> result = await mediator.SendAync(user);
 
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
@@ -62,9 +67,10 @@ public class CreateUserHandlerTest
 
         CreateUserCommand user = new(string.Empty, string.Empty, string.Empty);
 
-        IHandler<CreateUserCommand, Result<Userlogin>> commandHandler = new CreateUserHandler(context, service, new CreateUserValidator());
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
 
-        Result<Userlogin> result = await commandHandler.HandleAsync(user);
+
+        Result<Userlogin> result = await mediator.SendAync(user);
         result.Should().NotBeNull();
 
         result.IsSuccess.Should().BeFalse();
