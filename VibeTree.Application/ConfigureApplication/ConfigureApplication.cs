@@ -10,9 +10,8 @@ using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
-using VibeTree.Application.Result;
+using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.User;
-using VibeTree.Application.User.Get;
 using VibeTree.Application.User.Login;
 using VibeTree.User.CreateUser;
 namespace VibeTree.Application.ConfigureApplication;
@@ -52,11 +51,12 @@ public static class ConfigureApplication
 
         services.AddTransient<IHandler<CreatePerfilCommand,PerfilResponse>,  CreatePerfilHandler>();
         services.AddTransient<IHandler<GetPerfilByIdQuery, PerfilResponse>, GetPerfilByIdHandler>();
+        services.AddTransient<IHandler<GetPerfilBySlugQuery, PerfilResponse>, GetPerfilBySlugHandler>();
 
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreatePerfilCommand>, CreatePerfilValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
-        services.AddScoped<IMediator, Mediator.Mediator>();
+        services.AddSingleton<IMediator, Mediator.Mediator>();
 
 
 
