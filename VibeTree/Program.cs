@@ -11,11 +11,14 @@ using VibeTree.Application.Interfaces;
 using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
+using VibeTree.Application.Perfil.Get.GetById;
+using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.User.CreateUser;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -107,8 +110,25 @@ app.UseAuthorization();
 
 
 
-app.MapPost("/perfil/create", async (
-    [FromServices] IMediator mediator,
+app.MapGet("/perfil/{id}",async([FromServices] IMediator mediator,string id) =>
+{
+    Result<PerfilResponse> result = await mediator.SendAsync(new GetPerfilByIdQuery(id));
+
+    if (!result.IsSuccess)
+        return Results.NotFound(result);
+    return Results.Ok(result);
+});
+
+app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string slug) =>
+{
+    Result<PerfilResponse> result = await mediator.SendAsync(new GetPerfilBySlugQuery(slug));
+
+    if (!result.IsSuccess)
+        return Results.NotFound(result);
+    return Results.Ok(result);
+});
+
+app.MapPost("/perfil/create", async ([FromServices] IMediator mediator,
      [FromBody] CreatePerfilCommand command) =>
 {
 
@@ -131,7 +151,7 @@ app.MapPost("/user/create", async ([FromServices] IMediator mediator,
 
 
         return Results.Ok(result);
-    });
+});
 
 
 app.MapPost("/auth/login", async ([FromServices] IMediator mediator,[FromBody] LoginQuery loginQuery) => {
