@@ -13,14 +13,11 @@ public class CreateUserHandler (
     IValidator<CreateUserCommand> validator
     ) :IHandler<CreateUserCommand, Userlogin>
 {
-    private readonly AppDbContext _appDbContext = appDbContext;
-    private readonly ITokenService _tokenService = tokenService;
-    private readonly IValidator<CreateUserCommand> _validator = validator;
 
 
     public async Task<Result<Userlogin>> HandleAsync(CreateUserCommand command)
     {
-        var validationResult = await _validator.ValidateAsync(command);
+        var validationResult = await validator.ValidateAsync(command);
 
         if (!validationResult.IsValid)
             return validationResult.Errors.Select(e => new Error(e.ErrorMessage)).ToList();
@@ -35,10 +32,10 @@ public class CreateUserHandler (
             command.Email
         );
 
-        await _appDbContext.Users.AddAsync(user);
-        await _appDbContext.SaveChangesAsync();
+        await appDbContext.Users.AddAsync(user);
+        await appDbContext.SaveChangesAsync();
 
-       Token token = await  _tokenService.CriarToken(user);
+       Token token = await tokenService.CriarToken(user);
 
         return new Userlogin(user.Id, user.Name,user.Email, token.token);
           

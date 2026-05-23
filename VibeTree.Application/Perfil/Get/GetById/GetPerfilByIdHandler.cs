@@ -10,12 +10,11 @@ using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Application.Perfil.Get.GetById;
 
-public class GetPerfilByIdHandler(
-    AppDbContext appDbContext
-    ) : IHandler<GetPerfilByIdQuery, PerfilResponse>
+public partial class GetPerfilByIdHandler(AppDbContext appDbContext) : IHandler<GetPerfilByIdQuery, PerfilResponse>
 {
     public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilByIdQuery command)
     {
+
        var result = await appDbContext
             .perfils
             .FirstOrDefaultAsync(p => p.Id.Equals(Guid.Parse(command.id)));

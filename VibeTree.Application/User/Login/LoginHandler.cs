@@ -18,28 +18,24 @@ public class LoginHandler(
     IValidator<LoginQuery> validator
     ) : IHandler<LoginQuery, Userlogin>
 {
-    private readonly AppDbContext _appDbContext = appDbContext;
-    private readonly IValidator<LoginQuery> _valiator = validator;
-    private readonly ITokenService _tokenService = tokenService;
 
     public async Task<Result<Userlogin>> HandleAsync(LoginQuery query)
     {
 
-        var validationResult = _valiator.Validate(query);
+        var validationResult = validator.Validate(query);
 
         if (!validationResult.IsValid)
             return validationResult.Errors.Select(e => new Error(e.ErrorMessage)).ToList();
 
-        Domain.Entity.User? user = await this._appDbContext
+        Domain.Entity.User? user = await appDbContext
             .Users
-            .Where(u => u.Email.Equals(query.email))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(u => u.Email.Equals(query.email));
 
         if (user is null || !(BCryptNet.Verify(query.password, user?.PasswordHash)))
             return Error.InvalidCredentials;
 
 
-        Token token = await this._tokenService.CriarToken(user!);
+        Token token = await tokenService.CriarToken(user!);
 
         return new Userlogin(user!.Id, user.Name, user.Email, token.token);
 

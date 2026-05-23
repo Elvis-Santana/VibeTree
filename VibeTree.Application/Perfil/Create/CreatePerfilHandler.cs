@@ -17,16 +17,17 @@ public class CreatePerfilHandler(
 
     ) : IHandler<CreatePerfilCommand, PerfilResponse>
 {
-    private readonly AppDbContext _appDbContext = appDbContext;
-    private readonly IValidator<CreatePerfilCommand> _validator = validator;
 
 
     public async Task<Result<PerfilResponse>> HandleAsync(CreatePerfilCommand command)
     {
-        var validationResult = await _validator.ValidateAsync(command);
+        var validationResult = await validator.ValidateAsync(command);
 
         if (!validationResult.IsValid)
-            return validationResult.Errors.Select(e => new Error(e.ErrorMessage)).ToList();
+            return validationResult
+                .Errors
+                .Select(e => new Error(e.ErrorMessage))
+                .ToList();
 
         Domain.Entity.Perfil perfil = new Domain.Entity.Perfil(
                Guid.NewGuid(),
@@ -39,23 +40,20 @@ public class CreatePerfilHandler(
                Guid.Parse(command.IdUser)
         );
 
-        var user = await _appDbContext
+        var user = await appDbContext
              .Users
-             .Where((user) => user.Id.Equals(Guid.Parse(command.IdUser)))
-             .FirstOrDefaultAsync();
+             .FirstOrDefaultAsync((user) => user.Id.Equals(Guid.Parse(command.IdUser)));
 
         if (user is null)
-        {
             return new Error("não existe usuario com este idUser");
-        }
+        
 
 
-        await _appDbContext.perfils.AddAsync(perfil);
-        await _appDbContext.SaveChangesAsync();
+        await appDbContext.perfils.AddAsync(perfil);
+        await appDbContext.SaveChangesAsync();
 
 
         return new PerfilResponse(perfil.Id, perfil.Descricao, perfil.ImagemUrl, perfil.Slug, perfil.IdUser);
-
 
     }
 }
