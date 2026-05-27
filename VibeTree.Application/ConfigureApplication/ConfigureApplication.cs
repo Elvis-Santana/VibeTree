@@ -56,7 +56,7 @@ public static class ConfigureApplication
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreatePerfilCommand>, CreatePerfilValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
-        services.AddSingleton<IMediator, Mediator.Mediator>();
+        services.AddScoped<IMediator, Mediator.Mediator>();
 
 
 
