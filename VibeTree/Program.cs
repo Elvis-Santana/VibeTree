@@ -1,24 +1,24 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
+using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
+using VibeTree.Application.QuerySync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
+using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Infrastructure.Mediator;
+using VibeTree.Infrastructure.Query;
+using VibeTree.Infrastructure.Worker;
 using VibeTree.User.CreateUser;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,15 +26,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<AppDbContext>(optionsAction =>
+builder.Services.AddDbContext<WriteDbContext>(optionsAction =>
 {
     string connection = builder.Configuration
-    .GetConnectionString("DefaultConnection") ?? throw new ArgumentException();
+    .GetConnectionString("WriteDb") ?? throw new ArgumentException();
 
     optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
    
 
 });
+builder.Services.AddDbContext<ReadDbContext>(optionsAction =>
+{
+    string connection = builder.Configuration
+    .GetConnectionString("ReadDb") ?? throw new ArgumentException();
+
+    optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
+
+
+});
+builder.Services.AddScoped<IWriteDbContext, WriteDbContext>();
+
+builder.Services.AddScoped<IReadDbContext, ReadDbContext>();
 
 builder.Services.AddOpenApi(optionsAction =>
 {
@@ -77,6 +89,13 @@ builder.Services.AddOpenApi(optionsAction =>
 });
 
 builder.Services.ConfigureServicesApplication(builder.Configuration);
+
+
+builder.Services.AddHostedService<WorkerSynchronizeUserDb>();
+builder.Services.AddHostedService<WorkerSynchronizePerfilDb>();
+builder.Services.AddSingleton<IQueryJobSynchronize<SyncData<User>>, QueryJobSynchronizeUserDb>();
+builder.Services.AddSingleton<IQueryJobSynchronize<SyncData<Perfil>>, QueryJobSynchronizePerfilDb>();
+builder.Services.AddScoped<IMediator, Mediator>();
 
 const string policy = "_myAllowSpecificOrigins";
 
