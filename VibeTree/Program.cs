@@ -13,6 +13,7 @@ using VibeTree.Application.QuerySync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
+using VibeTree.Application.User.Update;
 using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.Infrastructure.Mediator;
@@ -147,7 +148,7 @@ app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string s
     return Results.Ok(result);
 });
 
-app.MapPost("/perfil/create", async ([FromServices] IMediator mediator,
+app.MapPost("/perfil", async ([FromServices] IMediator mediator,
      [FromBody] CreatePerfilCommand command) =>
 {
 
@@ -160,7 +161,7 @@ app.MapPost("/perfil/create", async ([FromServices] IMediator mediator,
     return Results.Ok(result);
 });
 
-app.MapPost("/user/create", async ([FromServices] IMediator mediator,
+app.MapPost("/user", async ([FromServices] IMediator mediator,
     [FromBody] CreateUserCommand createUserCommand) => {
 
         Result<Userlogin> result = await mediator.SendAsync(createUserCommand);
@@ -171,6 +172,18 @@ app.MapPost("/user/create", async ([FromServices] IMediator mediator,
 
         return Results.Ok(result);
 });
+
+app.MapPatch("/user", async ([FromServices] IMediator mediator,
+    [FromBody] UpdateUserCommand updateUserCommand) => {
+
+        Result<Userlogin> result = await mediator.SendAsync(updateUserCommand);
+
+        if (!result.IsSuccess)
+            return Results.BadRequest(result);
+
+
+        return Results.Ok(result);
+    });
 
 
 app.MapPost("/auth/login", async ([FromServices] IMediator mediator,[FromBody] LoginQuery loginQuery) => {
@@ -185,7 +198,7 @@ app.MapPost("/auth/login", async ([FromServices] IMediator mediator,[FromBody] L
 
 });
 
-app.MapGet("auth/me", async() => Results.Ok(new { valid=true })).RequireAuthorization(); 
+app.MapGet("/auth/me", async() => Results.Ok(new { valid=true })).RequireAuthorization(); 
 
 
 
