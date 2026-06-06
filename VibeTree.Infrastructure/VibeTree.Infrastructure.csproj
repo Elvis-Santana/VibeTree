@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VibeTree.Application\VibeTree.Application.csproj" />
     <ProjectReference Include="..\VibeTree.Domain\VibeTree.Domain.csproj" />
   </ItemGroup>
 
