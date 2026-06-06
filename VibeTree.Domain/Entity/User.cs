@@ -25,17 +25,17 @@ public class User : EntityBase
         Email = email;
     }
 
-    public void SetName(string ?Name)
-    {
-        this.Name = Name ?? this.Name;
-    }
+    public void SetName(string ?Name)=>
+        this.Name = string.IsNullOrEmpty(Name) ? this.Name : Name;
+    
 
-    public void SetEmail(string ?Email) { 
-     this.Email = Email??this.Email;
-    }
+    public void SetEmail(string ?Email) =>
+       this.Email = string.IsNullOrEmpty(Email) ? this.Email : Email;
 
-    public void setPasswordHash(string? PasswordHash )
-    {
-        this.PasswordHash = PasswordHash??this.PasswordHash;
-    }
+    
+
+    public void setPasswordHash(string? PasswordHash )=>
+        this.PasswordHash = string.IsNullOrEmpty(PasswordHash) ?this.PasswordHash : BCrypt.Net.BCrypt.HashPassword(PasswordHash);
+
+    
 }
