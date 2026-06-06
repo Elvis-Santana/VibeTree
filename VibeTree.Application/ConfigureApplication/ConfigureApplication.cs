@@ -1,18 +1,17 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
+using VibeTree.Application.User.Update;
 using VibeTree.User.CreateUser;
 namespace VibeTree.Application.ConfigureApplication;
 
@@ -56,7 +55,7 @@ public static class ConfigureApplication
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreatePerfilCommand>, CreatePerfilValidator>();
         services.AddScoped<IValidator<CreateUserCommand>, CreateUserValidator>();
-        services.AddScoped<IMediator, Mediator.Mediator>();
+        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
 
 
 
