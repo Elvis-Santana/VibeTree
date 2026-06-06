@@ -1,24 +1,20 @@
 ﻿using Bogus;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NSubstitute.Extensions;
+using System.Threading;
+using VibeTree.Application;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
+using VibeTree.Application.Interfaces.IQueryJob;
+using VibeTree.Application.QuerySync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
-using VibeTree.Application.User.Login;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Domain;
+using VibeTree.Infrastructure.Query;
 using VibeTree.User.CreateUser;
-namespace VibeTree.Test.UserTests.CreateUserTest;
+namespace VibeTree.Test.UserTests.CreateTest.Integracao;
 
-public class CreateUserHandlerTest
+public class CreateUserHandlerIntegracao 
 {
 
   
@@ -28,19 +24,19 @@ public class CreateUserHandlerTest
     {
 
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+        var context = await db.CriarContextoWritePreparadoAsync();
+
 
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
-        var faker = new Faker<CreateUserCommand>("pt_BR")
+        CreateUserCommand user = new Faker<CreateUserCommand>("pt_BR")
         .CustomInstantiator(f =>
-        new(f.Person.FullName, BCrypt.Net.BCrypt.HashPassword(f.Internet.Password()), f.Person.Email));
+        new(f.Person.FullName, f.Internet.Password(), f.Person.Email)).Generate();
 
-        CreateUserCommand user = faker.Generate();
-
-    
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
+        IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueryJobSynchronizeUserDb();
+        IMediator mediator = FactoryMed
+            .CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator(), queryJobSynchronize));
 
 
         Result<Userlogin> result = await mediator.SendAsync(user);
@@ -53,6 +49,16 @@ public class CreateUserHandlerTest
         result.Value.Token.Should().NotBeNullOrWhiteSpace();
 
 
+        queryJobSynchronize.HasPending.Should().BeTrue();
+       await foreach (var job in queryJobSynchronize.ReadAllAsync())
+       {
+            job.Operation.Should().Be(SyncOperation.Create);
+            job.Item.Id.Should().Be(result.Value.Id);
+            BCrypt.Net.BCrypt.Verify(user.Password, job.Item.PasswordHash).Should().BeTrue();
+
+            break;
+       }
+
 
     }
 
@@ -60,14 +66,15 @@ public class CreateUserHandlerTest
     public async Task CreateUserHandler_Should_Return_Error_When_Invalid_Data()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+        IWriteDbContext context = await db.CriarContextoWritePreparadoAsync();
 
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
 
         CreateUserCommand user = new(string.Empty, string.Empty, string.Empty);
+        IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueryJobSynchronizeUserDb();
 
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator()));
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreateUserHandler(context, service, new CreateUserValidator(), queryJobSynchronize));
 
 
         Result<Userlogin> result = await mediator.SendAsync(user);
@@ -82,6 +89,10 @@ public class CreateUserHandlerTest
 
         result.Errors.Contains(Error.PasswordEmpty).Should().BeTrue();
         result.Errors.Contains(Error.PasswordMinimumLength).Should().BeTrue();
+
+        queryJobSynchronize.HasPending.Should().BeFalse();
+
+
 
 
     }
