@@ -1,17 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
+using VibeTree.Application.Interfaces;
 using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Test;
 
 public  class DbContextBuildConfig : IAsyncDisposable
 {
-    private readonly DbContextOptions<AppDbContext> _options;
+    private readonly DbContextOptions<WriteDbContext> _writeOptions;
+    private readonly DbContextOptions<ReadDbContext> _readOptions;
     private readonly SqliteConnection _sqliteConnection;
 
     public DbContextBuildConfig()
@@ -19,18 +21,28 @@ public  class DbContextBuildConfig : IAsyncDisposable
          _sqliteConnection = new SqliteConnection("Filename=:memory:");
          _sqliteConnection.Open();
 
-        _options = new DbContextOptionsBuilder<AppDbContext>()
+        _writeOptions = new DbContextOptionsBuilder<WriteDbContext>()
+         .UseSqlite(_sqliteConnection)
+         .Options;
+
+        _readOptions = new DbContextOptionsBuilder<ReadDbContext>()
          .UseSqlite(_sqliteConnection)
          .Options;
 
     }
 
-    public async Task<AppDbContext> CriarContextoPreparadoAsync()
+    public async Task<IWriteDbContext> CriarContextoWritePreparadoAsync()
     {
-        var context = new AppDbContext(_options);
+        var context = new WriteDbContext(_writeOptions);
 
         await  context.Database.EnsureCreatedAsync();
 
+        return context;
+    }
+    public async Task<IReadDbContext> CriarContextoReadPreparadoAsync()
+    {
+        var context = new ReadDbContext(_readOptions);
+        await context.Database.EnsureCreatedAsync();
         return context;
     }
 
