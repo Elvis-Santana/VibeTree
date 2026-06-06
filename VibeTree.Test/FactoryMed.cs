@@ -6,10 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
-using VibeTree.Application.Perfil;
-using VibeTree.Application.Perfil.Create;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Infrastructure.Mediator;
+
 
 namespace VibeTree.Test;
 
