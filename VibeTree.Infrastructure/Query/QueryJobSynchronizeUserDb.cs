@@ -16,7 +16,7 @@ public class QueryJobSynchronizeUserDb : IQueryJobSynchronize<SyncData<Domain.En
 
     public bool HasPending => _channel.Reader.TryPeek(out _);
 
-    public async ValueTask AddJob(SyncData<Domain.Entity.User> jobSynchronize, CancellationToken cancellationToken)
+    public async ValueTask AddJobAsync(SyncData<Domain.Entity.User> jobSynchronize, CancellationToken cancellationToken)
        => await _channel.Writer.WriteAsync(jobSynchronize, cancellationToken);
     
 

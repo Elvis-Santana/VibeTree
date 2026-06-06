@@ -22,7 +22,7 @@ public class QueryJobSynchronizePerfilDb : IQueryJobSynchronize<SyncData<Perfil>
 
     public bool HasPending => _channel.Reader.TryPeek(out _);
 
-    public ValueTask AddJob(SyncData<Perfil> jobSynchronize, CancellationToken cancellationToken = default)
+    public ValueTask AddJobAsync(SyncData<Perfil> jobSynchronize, CancellationToken cancellationToken = default)
         => _channel.Writer.WriteAsync(jobSynchronize, cancellationToken);
 
 
