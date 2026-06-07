@@ -52,6 +52,7 @@ public class CreatePerfilHandler(
 
         await appDbContext.perfils.AddAsync(perfil);
         await appDbContext.SaveChangesAsync();
+        await queryJobSynchronize.AddJobAsync(new SyncData<Domain.Entity.Perfil>(perfil, SyncOperation.Create));
 
 
         return new PerfilResponse(perfil.Id, perfil.Descricao, perfil.ImagemUrl, perfil.Slug, perfil.IdUser);
