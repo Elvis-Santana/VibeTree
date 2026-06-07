@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VibeTree.Application.User.Delete;
 using VibeTree.Application.User.Update;
 using VibeTree.User.CreateUser;
 
@@ -89,4 +90,32 @@ public class ValidatorUserUnitario
         // Assert
         result.IsValid.Should().BeFalse();
     }
+
+    [Fact]
+    public void Validate_ValidDeleteUserCommand_ReturnsError()
+    {
+        // Arrange
+        var command = new DeleteUserCommand(Guid.NewGuid().ToString());
+        var validator = new DeleteUserValidator();
+
+        // Act
+        var result = validator.Validate(command);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
+    }
+    [Fact]
+    public void Validate_ValidDeleteUserCommand_ReturnsSuccess()
+    {
+        // Arrange
+        var command = new DeleteUserCommand(string.Empty);
+        var validator = new DeleteUserValidator();
+
+        // Act
+        var result = validator.Validate(command);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+    }
+
 }
