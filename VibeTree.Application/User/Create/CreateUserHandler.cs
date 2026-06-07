@@ -8,7 +8,7 @@ using VibeTree.Infrastructure.AppDbContext;
 namespace VibeTree.User.CreateUser;
 
 public class CreateUserHandler (
-    AppDbContext appDbContext,
+    IWriteDbContext appDbContext,
     ITokenService tokenService,
     IValidator<CreateUserCommand> validator
     ) :IHandler<CreateUserCommand, Userlogin>
