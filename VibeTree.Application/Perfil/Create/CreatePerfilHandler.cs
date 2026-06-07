@@ -14,6 +14,7 @@ namespace VibeTree.Application.Perfil.Create;
 public class CreatePerfilHandler(
     AppDbContext appDbContext,
    IValidator<CreatePerfilCommand> validator
+    IQueryJobSynchronize<SyncData<Domain.Entity.Perfil>> queryJobSynchronize
 
     ) : IHandler<CreatePerfilCommand, PerfilResponse>
 {
