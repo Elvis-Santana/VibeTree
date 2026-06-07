@@ -20,7 +20,8 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 
         RuleFor(x => x.Email)
            .NotEmpty().WithMessage(Error.EmailEmpty.Message)
-           .EmailAddress().WithMessage(Error.EmailAddress.Message);
+           .EmailAddress(FluentValidation.Validators.EmailValidationMode.Net4xRegex)
+           .WithMessage(Error.EmailAddress.Message);
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage(Error.PasswordEmpty.Message)
