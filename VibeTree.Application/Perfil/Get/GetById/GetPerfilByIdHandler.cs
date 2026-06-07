@@ -6,11 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Result;
-using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Application.Perfil.Get.GetById;
 
-public partial class GetPerfilByIdHandler(AppDbContext appDbContext) : IHandler<GetPerfilByIdQuery, PerfilResponse>
+public partial class GetPerfilByIdHandler(IReadDbContext appDbContext) : IHandler<GetPerfilByIdQuery, PerfilResponse>
 {
     public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilByIdQuery command)
     {

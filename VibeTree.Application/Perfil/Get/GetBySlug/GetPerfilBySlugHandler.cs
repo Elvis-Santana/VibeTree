@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Result;
-using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Application.Perfil.Get.GetBySlug;
 
-public partial class GetPerfilBySlugHandler (AppDbContext appDbContext) : IHandler<GetPerfilBySlugQuery, PerfilResponse>
+public partial class GetPerfilBySlugHandler (IReadDbContext appDbContext) : IHandler<GetPerfilBySlugQuery, PerfilResponse>
 {
     public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilBySlugQuery command)
     {
@@ -23,4 +22,6 @@ public partial class GetPerfilBySlugHandler (AppDbContext appDbContext) : IHandl
                 result.IdUser
           );
     }
+
+  
 }
