@@ -1,16 +1,18 @@
 ﻿using FluentValidation;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Interfaces.IQueryJob;
+using VibeTree.Application.QuerySync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
-using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.User.CreateUser;
 
 public class CreateUserHandler (
     IWriteDbContext appDbContext,
     ITokenService tokenService,
-    IValidator<CreateUserCommand> validator
+    IValidator<CreateUserCommand> validator,
+    IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize
     ) :IHandler<CreateUserCommand, Userlogin>
 {
 
@@ -34,8 +36,9 @@ public class CreateUserHandler (
 
         await appDbContext.Users.AddAsync(user);
         await appDbContext.SaveChangesAsync();
+        await queryJobSynchronize.AddJobAsync(new SyncData<Domain.Entity.User>(user, SyncOperation.Create));
 
-       Token token = await tokenService.CriarToken(user);
+        Token token = await tokenService.CriarToken(user);
 
         return new Userlogin(user.Id, user.Name,user.Email, token.token);
           
