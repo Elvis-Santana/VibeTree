@@ -1,22 +1,10 @@
 ﻿using Bogus;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
-using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
-using VibeTree.Domain.Entity;
-using VibeTree.Infrastructure.AppDbContext;
-using VibeTree.User.CreateUser;
 
 namespace VibeTree.Test.UserTests.LoginTest;
 
@@ -32,7 +20,7 @@ public class LoginHandlerTest
         var service = new TokenService(config);
 
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+         var context = await db.CriarContextoReadPreparadoAsync();
 
         string password = new Faker("pt_BR").Internet.Password();
 
@@ -69,7 +57,7 @@ public class LoginHandlerTest
         var service = new TokenService(config);
 
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+        var context = await db.CriarContextoReadPreparadoAsync();
         string password = new Faker("pt_BR").Internet.Password();
         var userFaker = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f => new Domain.Entity.User(
@@ -107,7 +95,7 @@ public class LoginHandlerTest
         var config = JwtBuildConfig.BuildConfig();
         var service = new TokenService(config);
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+          var context = await db.CriarContextoReadPreparadoAsync();
 
         string password = new Faker("pt_BR").Internet.Password();
 

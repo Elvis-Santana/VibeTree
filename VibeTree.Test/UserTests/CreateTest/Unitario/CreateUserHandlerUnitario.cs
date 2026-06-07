@@ -43,7 +43,7 @@ public class CreateUserHandlerUnitario
 
         await _dbMock.DidNotReceive().SaveChangesAsync();
         await _tokenMock.DidNotReceiveWithAnyArgs().CriarToken(default!);
-        await _jobMock.DidNotReceiveWithAnyArgs().AddJob(default!);
+        await _jobMock.DidNotReceiveWithAnyArgs().AddJobAsync(default!);
 
 
 
