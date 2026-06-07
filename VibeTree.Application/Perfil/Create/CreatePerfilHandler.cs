@@ -6,14 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Interfaces.IQueryJob;
+using VibeTree.Application.QuerySync;
 using VibeTree.Application.Result;
-using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Application.Perfil.Create;
 
 public class CreatePerfilHandler(
-    AppDbContext appDbContext,
-   IValidator<CreatePerfilCommand> validator
+    IWriteDbContext appDbContext,
+   IValidator<CreatePerfilCommand> validator,
     IQueryJobSynchronize<SyncData<Domain.Entity.Perfil>> queryJobSynchronize
 
     ) : IHandler<CreatePerfilCommand, PerfilResponse>
