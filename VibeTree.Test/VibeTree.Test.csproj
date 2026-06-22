@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+	  <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,16 +19,24 @@
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+	  
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VibeTree.Application\VibeTree.Application.csproj" />
     <ProjectReference Include="..\VibeTree.Domain\VibeTree.Domain.csproj" />
     <ProjectReference Include="..\VibeTree.Infrastructure\VibeTree.Infrastructure.csproj" />
+    <ProjectReference Include="..\VibeTree\VibeTree.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
