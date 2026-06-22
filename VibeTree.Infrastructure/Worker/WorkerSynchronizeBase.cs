@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 
 namespace VibeTree.Infrastructure.Worker;
 
 public abstract class WorkerSynchronizeBase<T>(
-    IQueryJobSynchronize<SyncData<T>> jobSynchronize, 
+    IQueueSynchronizeDb<SyncData<T>> jobSynchronize, 
     IServiceProvider serviceProvider,
     ILogger logger 
 ) : BackgroundService

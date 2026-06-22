@@ -1,10 +1,10 @@
 ﻿using System.Threading.Channels;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 
 namespace VibeTree.Infrastructure.Query;
 
-public class QueryJobSynchronizeUserDb : IQueryJobSynchronize<SyncData<Domain.Entity.User>>
+public class QueueSynchronizeUserDb : IQueueSynchronizeDb<SyncData<Domain.Entity.User>>
 {
 
     private readonly Channel<SyncData<Domain.Entity.User>> _channel = Channel.CreateBounded<SyncData<Domain.Entity.User>>(

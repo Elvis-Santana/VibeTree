@@ -5,7 +5,7 @@ using NSubstitute;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.User.CreateUser;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -15,7 +15,7 @@ public class CreateUserHandlerUnitario
 {
     private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
     private readonly ITokenService _tokenMock = Substitute.For<ITokenService>();
-    private readonly IQueryJobSynchronize<SyncData<Domain.Entity.User>> _jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.User>>>();
+    private readonly IQueueSynchronizeDb<SyncData<Domain.Entity.User>> _jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
     private readonly IValidator<CreateUserCommand> _validatorMock = Substitute.For<IValidator<CreateUserCommand>>();
 
 

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Application.Result;
 
 namespace VibeTree.Application.Perfil.Create;
@@ -15,7 +15,7 @@ namespace VibeTree.Application.Perfil.Create;
 public class CreatePerfilHandler(
     IWriteDbContext appDbContext,
    IValidator<CreatePerfilCommand> validator,
-    IQueryJobSynchronize<SyncData<Domain.Entity.Perfil>> queryJobSynchronize
+    IQueueSynchronizeDb<SyncData<Domain.Entity.Perfil>> queryJobSynchronize
 
     ) : IHandler<CreatePerfilCommand, PerfilResponse>
 {

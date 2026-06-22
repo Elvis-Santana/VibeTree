@@ -5,7 +5,7 @@ using NSubstitute;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User.Update;
 using ValidationResult = FluentValidation.Results.ValidationResult;
@@ -17,7 +17,7 @@ public class UpdateUserHandlerUnitario
     private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
     private readonly ITokenService _tokenMock = Substitute.For<ITokenService>();
 
-    private readonly IQueryJobSynchronize<SyncData<Domain.Entity.User>> _jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.User>>>();
+    private readonly IQueueSynchronizeDb<SyncData<Domain.Entity.User>> _jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
     private readonly IValidator<UpdateUserCommand> _validatorMock = Substitute.For<IValidator<UpdateUserCommand>>();
 
     public UpdateUserHandler UpdateUser() => new (_dbMock, _tokenMock, _validatorMock, _jobMock);
@@ -38,8 +38,8 @@ public class UpdateUserHandlerUnitario
             .ValidateAsync(Arg.Any<UpdateUserCommand>())
             .Returns(erros);
 
-        var createUserCommand = new UpdateUserCommand(string.Empty, "na","@@","123");
-        var result = await UpdateUser().HandleAsync(createUserCommand);
+        var updateUserCommand = new UpdateUserCommand(string.Empty, "na","@@","123");
+        var result = await UpdateUser().HandleAsync(updateUserCommand);
 
         erros.Errors.Select(x => x.ErrorMessage)
             .SequenceEqual(result.Errors!.Select(e => e.Message))
@@ -62,10 +62,10 @@ public class UpdateUserHandlerUnitario
              .ValidateAsync(Arg.Any<UpdateUserCommand>())
              .Returns(new ValidationResult());
 
-        var createUserCommand = new UpdateUserCommand(Guid.NewGuid().ToString(), string.Empty, string.Empty, string.Empty);
+        var updateUserCommand = new UpdateUserCommand(Guid.NewGuid().ToString(), string.Empty, string.Empty, string.Empty);
         _dbMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<Domain.Entity.User>(null));
 
-        var result = await UpdateUser().HandleAsync(createUserCommand);
+        var result = await UpdateUser().HandleAsync(updateUserCommand);
         result.IsSuccess.Should().BeFalse();
         result.Errors!.Should().Contain(Error.NotFound);
 

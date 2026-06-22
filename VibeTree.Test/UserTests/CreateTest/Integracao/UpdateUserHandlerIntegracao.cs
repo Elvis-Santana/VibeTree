@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Update;
@@ -44,7 +44,7 @@ public class UpdateUserHandlerIntegracao
             )
         ).Generate();
 
-        IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueryJobSynchronizeUserDb();
+        IQueueSynchronizeDb<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueueSynchronizeUserDb();
 
         IMediator mediator = FactoryMed
         .CreateMediatorWithHandler(
@@ -91,7 +91,7 @@ public class UpdateUserHandlerIntegracao
             f.Internet.Password())
         ).Generate();
 
-        IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueryJobSynchronizeUserDb();
+        IQueueSynchronizeDb<SyncData<Domain.Entity.User>> queryJobSynchronize = new QueueSynchronizeUserDb();
 
         IMediator mediator = FactoryMed
         .CreateMediatorWithHandler(

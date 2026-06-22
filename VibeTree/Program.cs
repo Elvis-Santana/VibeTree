@@ -9,7 +9,7 @@ using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
@@ -45,6 +45,7 @@ builder.Services.AddDbContext<ReadDbContext>(optionsAction =>
 
 
 });
+
 builder.Services.AddScoped<IWriteDbContext, WriteDbContext>();
 
 builder.Services.AddScoped<IReadDbContext, ReadDbContext>();
@@ -94,8 +95,8 @@ builder.Services.ConfigureServicesApplication(builder.Configuration);
 
 builder.Services.AddHostedService<WorkerSynchronizeUserDb>();
 builder.Services.AddHostedService<WorkerSynchronizePerfilDb>();
-builder.Services.AddSingleton<IQueryJobSynchronize<SyncData<User>>, QueryJobSynchronizeUserDb>();
-builder.Services.AddSingleton<IQueryJobSynchronize<SyncData<Perfil>>, QueryJobSynchronizePerfilDb>();
+builder.Services.AddSingleton<IQueueSynchronizeDb<SyncData<User>>, QueueSynchronizeUserDb>();
+builder.Services.AddSingleton<IQueueSynchronizeDb<SyncData<Perfil>>, QueueSynchronizePerfilDb>();
 builder.Services.AddScoped<IMediator, Mediator>();
 
 const string policy = "_myAllowSpecificOrigins";

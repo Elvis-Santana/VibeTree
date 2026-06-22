@@ -2,7 +2,7 @@
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Application.Result;
 using VibeTree.Application.User;
 
@@ -12,7 +12,7 @@ public class CreateUserHandler (
     IWriteDbContext appDbContext,
     ITokenService tokenService,
     IValidator<CreateUserCommand> validator,
-    IQueryJobSynchronize<SyncData<Domain.Entity.User>> queryJobSynchronize
+    IQueueSynchronizeDb<SyncData<Domain.Entity.User>> queryJobSynchronize
     ) :IHandler<CreateUserCommand, Userlogin>
 {
 
@@ -33,7 +33,6 @@ public class CreateUserHandler (
             BCrypt.Net.BCrypt.HashPassword(command.Password),
             command.Email
         );
-
         await appDbContext.Users.AddAsync(user);
         await appDbContext.SaveChangesAsync();
         await queryJobSynchronize.AddJobAsync(new SyncData<Domain.Entity.User>(user, SyncOperation.Create));

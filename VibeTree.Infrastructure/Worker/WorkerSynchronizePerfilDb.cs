@@ -8,13 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Domain.Entity;
 
 namespace VibeTree.Infrastructure.Worker;
 
 public class WorkerSynchronizePerfilDb(
-    IQueryJobSynchronize<SyncData<Perfil>> jobSynchronize,
+    IQueueSynchronizeDb<SyncData<Perfil>> jobSynchronize,
     IServiceProvider serviceProvider,
             ILogger<WorkerSynchronizePerfilDb> logger
 )

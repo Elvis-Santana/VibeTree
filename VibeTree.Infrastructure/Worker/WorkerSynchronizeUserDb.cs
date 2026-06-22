@@ -5,13 +5,13 @@ using System;
 using System.Text.Json;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VibeTree.Infrastructure.Worker;
 
 public class WorkerSynchronizeUserDb(
-    IQueryJobSynchronize<SyncData<Domain.Entity.User>>
+    IQueueSynchronizeDb<SyncData<Domain.Entity.User>>
     jobSynchronize, IServiceProvider serviceProvider,
         ILogger<WorkerSynchronizeUserDb> logger
 
