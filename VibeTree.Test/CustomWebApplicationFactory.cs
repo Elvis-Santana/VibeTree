@@ -10,13 +10,26 @@ using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Net.Http.Json;
 using VibeTree.Application.Interfaces;
+using VibeTree.Application.Interfaces.IQueryJob;
+using VibeTree.Application.Sync;
 using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Infrastructure.Query;
 using VibeTree.User.CreateUser;
 
 namespace VibeTree.Test;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<global::Program>
+
+public class CustomWebApplicationFactory : WebApplicationFactory<global::Program>, IAsyncLifetime
 {
+    public async Task InitializeAsync()
+    {
+        using var scope = Services.CreateScope();
+        var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+
+        await writeDb.Database.EnsureCreatedAsync();
+        await readDb.Database.EnsureCreatedAsync();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -34,6 +47,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
             services.RemoveAll(typeof(IWriteDbContext));
 
             //services.RemoveAll(typeof(IHostedService));
+            services.RemoveAll<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
+            services.AddSingleton<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>, QueueSynchronizeUserDb>();
+
+
 
             // Criar um provider EF isolado para o InMemory (evita conflito com Pomelo/MySql)
             ServiceProvider efInMemoryServiceProvider = new ServiceCollection()
@@ -54,5 +71,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
             services.AddScoped<IWriteDbContext, WriteDbContext>();
         });
 
+    }
+
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        await base.DisposeAsync().AsTask();
     }
 }
