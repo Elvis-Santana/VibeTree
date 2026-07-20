@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using VibeTree.Application.Auth.ValueObject;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Perfil;
-using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.Result;
@@ -153,18 +151,6 @@ app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string s
     return Results.Ok(result);
 });
 
-app.MapPost("/perfil", async ([FromServices] IMediator mediator,
-     [FromBody] CreatePerfilCommand command) =>
-{
-
-    Result<PerfilResponse> result = await mediator.SendAsync(command);
-
-    if (!result.IsSuccess)
-        return Results.BadRequest(result);
-
-
-    return Results.Ok(result);
-});
 
 app.MapPost("/user", async ([FromServices] IMediator mediator,
     [FromBody] CreateUserAndProfileCommand createUserCommand) => {
