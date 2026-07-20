@@ -23,6 +23,7 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
 
     
  
+   
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,10 +39,18 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
             u.Property(x => x.CreatedAt);
             u.Property(x => x.UpdatedAt);
 
+
+            u.Property(x => x.Id)
+            .ValueGeneratedNever();
+
+  
+
             u.HasMany(x => x.Links)
            .WithOne()
            .HasForeignKey(l => l.IdUser)
            .OnDelete(DeleteBehavior.Cascade);
+
+
 
         });
 
@@ -50,6 +59,9 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
         modelBuilder.Entity<Perfil>(p =>
         {
             p.HasKey(x => x.Id);
+
+            p.Property(x => x.Id)
+            .ValueGeneratedNever();
             p.Property(x => x.Descricao).HasMaxLength(255);
             p.Property(x => x.Slug).HasMaxLength(255);
             p.Property(x => x.ImagemUrl);
@@ -57,10 +69,11 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
             p.Property(x => x.CreatedAt);
             p.Property(x => x.UpdatedAt);
 
-            p.HasOne<UserEntity>()
-            .WithOne()
-            .HasForeignKey<Perfil>(x => x.IdUser)
-            .OnDelete(DeleteBehavior.Cascade);
+            p.HasOne<UserEntity>()                    
+            .WithOne(u => u.Perfil)                   
+            .HasForeignKey<Perfil>(x => x.IdUser)     
+            .OnDelete(DeleteBehavior.Cascade)       
+            .IsRequired(false);
 
 
         });
