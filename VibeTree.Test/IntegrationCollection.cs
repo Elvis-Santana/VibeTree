@@ -11,3 +11,4 @@ public class IntegrationCollection : ICollectionFixture<CustomWebApplicationFact
 {
     public const string Name = "Integration";
 }
+

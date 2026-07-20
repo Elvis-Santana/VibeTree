@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using FluentAssertions;
-using VibeTree.Application.Mediator;
+using VibeTree.Application.Interfaces;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.Result;
@@ -15,7 +15,7 @@ public class GetPerfilBySlugHandlerTest
     public async Task GetPerfilBySlugHandler_Should_QueryBySlug_Perfil()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+          var context = await db.CriarContextoReadPreparadoAsync();
 
         Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f => new(Guid.NewGuid(),
@@ -57,7 +57,7 @@ public class GetPerfilBySlugHandlerTest
     public async Task GetPerfilBySlugHandler_Should_QueryBySlug_Perfil_Error()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+        var context = await db.CriarContextoReadPreparadoAsync();
 
      
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilBySlugHandler(context));

@@ -1,12 +1,9 @@
 ﻿using Bogus;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Mediator;
-using VibeTree.Application.Perfil;
+using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Perfil.Create;
-using VibeTree.Application.Result;
+using VibeTree.Infrastructure.Query;
 namespace VibeTree.Test.PerfilTest.CreateTest;
 
 public class CreatePerfilHandlerTest
@@ -17,7 +14,7 @@ public class CreatePerfilHandlerTest
     {
         await using var db = new DbContextBuildConfig();
 
-        await using var context = await db.CriarContextoPreparadoAsync();
+          var context = await db.CriarContextoWritePreparadoAsync();
         var faker = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f =>  new (Guid.NewGuid(),
                 DateTime.Now,
@@ -36,9 +33,10 @@ public class CreatePerfilHandlerTest
        var createPerfilCommand = new Faker<CreatePerfilCommand>("pt_BR")
             .CustomInstantiator(f =>
             new(f.Internet.Color(), f.Lorem.Text(), f.Image.LoremFlickrUrl(), f.Internet.Url(), user.Id.ToString())).Generate();
-      
 
-        IMediator mediator  = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator()));
+
+        var queryJobSynchronize = new QueueSynchronize<Domain.Entity.Perfil>();
+        IMediator mediator  = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator(), queryJobSynchronize));
         var result = await mediator.SendAsync(createPerfilCommand);
 
 
@@ -55,7 +53,7 @@ public class CreatePerfilHandlerTest
     {
         
        await using var db  =  new DbContextBuildConfig();
-       await using var context = await db.CriarContextoPreparadoAsync();
+         var context = await db.CriarContextoWritePreparadoAsync();
 
  
         var createPerfilCommand = new Faker<CreatePerfilCommand>("pt_BR")
@@ -67,7 +65,8 @@ public class CreatePerfilHandlerTest
                  f.Internet.Url(),
                  Guid.NewGuid().ToString())).Generate();
 
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator()));
+        var queryJobSynchronize = new QueueSynchronize<Domain.Entity.Perfil>();
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator(), queryJobSynchronize));
 
 
         var result = await mediator.SendAsync(createPerfilCommand);
@@ -81,10 +80,12 @@ public class CreatePerfilHandlerTest
     public async Task CreatePerfilHandler_Should_Create_Perfil_Error()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+          var context = await db.CriarContextoWritePreparadoAsync();
 
         var createPerfilCommand = new CreatePerfilCommand(string.Empty,string.Empty,string.Empty,string.Empty,string.Empty);
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator()));
+        var queryJobSynchronize = new QueueSynchronize<Domain.Entity.Perfil>();
+
+        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new CreatePerfilHandler(context, new CreatePerfilValidator(), queryJobSynchronize));
 
         var result = await mediator.SendAsync(createPerfilCommand);
 

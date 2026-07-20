@@ -2,8 +2,10 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +23,10 @@ namespace VibeTree.Test;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<global::Program>, IAsyncLifetime
 {
+    private SqliteConnection? _readConnection;
+    private SqliteConnection? _writeConnection;
+
+    private readonly string _uniqueId = Guid.NewGuid().ToString();
     public async Task InitializeAsync()
     {
         using var scope = Services.CreateScope();
@@ -33,48 +39,79 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var root = new InMemoryDatabaseRoot();
         builder.UseEnvironment("Development");
 
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices(async services =>
         {
-            // Remover todas as entradas relacionadas ao EF registradas pela aplicação real
-            services.RemoveAll(typeof(DbContextOptions<ReadDbContext>));
-            services.RemoveAll(typeof(DbContextOptions<WriteDbContext>));
-            services.RemoveAll(typeof(ReadDbContext));
-            services.RemoveAll(typeof(WriteDbContext));
-            services.RemoveAll(typeof(IReadDbContext));
-            services.RemoveAll(typeof(IWriteDbContext));
-
-            //services.RemoveAll(typeof(IHostedService));
-            services.RemoveAll<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
-            services.AddSingleton<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>, QueueSynchronizeUserDb>();
+        //services.RemoveAll(typeof(DbContextOptions<ReadDbContext>));
+        //services.RemoveAll(typeof(DbContextOptions<WriteDbContext>));
+        //services.RemoveAll(typeof(DbContextOptions));
+        //services.RemoveAll(typeof(ReadDbContext));
+        //services.RemoveAll(typeof(WriteDbContext));
+        //services.RemoveAll(typeof(IReadDbContext));
+        //services.RemoveAll(typeof(IWriteDbContext));
+        //services.RemoveAll(typeof(DbContext));
 
 
+        var efServices = services.Where(d =>
+            d.ServiceType.FullName != null && (
+            d.ServiceType.FullName.StartsWith("Microsoft.EntityFrameworkCore") ||
+            d.ServiceType.FullName.StartsWith("Pomelo.EntityFrameworkCore") ||
+            d.ServiceType == typeof(DbContextOptions<WriteDbContext>) ||
+            d.ServiceType == typeof(DbContextOptions<ReadDbContext>) ||
+            d.ServiceType == typeof(WriteDbContext) ||
+            d.ServiceType == typeof(ReadDbContext) ||
+            d.ServiceType == typeof(IWriteDbContext) ||
+            d.ServiceType == typeof(IReadDbContext))
 
-            // Criar um provider EF isolado para o InMemory (evita conflito com Pomelo/MySql)
-            ServiceProvider efInMemoryServiceProvider = new ServiceCollection()
-                .AddEntityFrameworkInMemoryDatabase()
-                .BuildServiceProvider();
+        ).ToList();
 
-            // Registrar DbContexts com InMemory apenas para os testes e usar provider interno isolado
-            services.AddDbContext<ReadDbContext>(options =>
-                options.UseInMemoryDatabase("read", root)
-                       .UseInternalServiceProvider(efInMemoryServiceProvider));
+            foreach (var service in efServices)
+            {
+                services.Remove(service);
+            }
 
-            services.AddDbContext<WriteDbContext>(options =>
-                options.UseInMemoryDatabase("write", root)
-                       .UseInternalServiceProvider(efInMemoryServiceProvider));
+            _writeConnection = new SqliteConnection($"Data Source=write_db_{_uniqueId};Mode=Memory;Cache=Shared");
+            _writeConnection.Open();
 
-            // Garantir mapeamento das interfaces usadas pela aplicação
-            services.AddScoped<IReadDbContext, ReadDbContext>();
+            _readConnection = new SqliteConnection($"Data Source=read_db_{_uniqueId};Mode=Memory;Cache=Shared");
+            _readConnection.Open();
+
+            services.AddDbContext<WriteDbContext>(options => options.UseSqlite(_writeConnection));
             services.AddScoped<IWriteDbContext, WriteDbContext>();
-        });
 
+            services.AddDbContext<ReadDbContext>(options => options.UseSqlite(_readConnection));
+            services.AddScoped<IReadDbContext, ReadDbContext>();
+
+
+
+            //var sp = services.BuildServiceProvider();
+            //using var scope = sp.CreateScope();
+
+            //var writeContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+            //writeContext.Database.EnsureCreated();
+
+            //var readContext = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+            //readContext.Database.EnsureCreated();
+
+
+           
+        });
     }
+
 
     async Task IAsyncLifetime.DisposeAsync()
     {
-        await base.DisposeAsync().AsTask();
+        if (_readConnection != null)
+        {
+            await _readConnection.CloseAsync();
+            await _readConnection.DisposeAsync();
+        }
+
+        if (_writeConnection != null)
+        {
+            await _writeConnection.CloseAsync();
+            await _writeConnection.DisposeAsync();
+        }
     }
 }

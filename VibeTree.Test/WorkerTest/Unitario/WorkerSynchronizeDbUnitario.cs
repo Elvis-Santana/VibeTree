@@ -8,7 +8,7 @@ using NSubstitute.ReceivedExtensions;
 using System.Runtime.CompilerServices;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.QuerySync;
+using VibeTree.Application.Sync;
 using VibeTree.Infrastructure.Worker;
 
 namespace VibeTree.Test.WorkerTest.Unitario;
@@ -44,7 +44,7 @@ public class WorkerSynchronizeDbUnitario
                 f.Internet.Email()
             )).Generate(count);
 
-        var jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.User>>>();
+        var jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
 
         jobMock.ReadAllAsync(Arg.Any<CancellationToken>())
                .Returns(ToAsyncEnumerable(usuarios, SyncOperation.Create));
@@ -55,7 +55,7 @@ public class WorkerSynchronizeDbUnitario
 
 
         var services = new ServiceCollection();
-        services.AddScoped<IReadDbContext>(_=> dbMock);
+        services.AddScoped(_=> dbMock);
         ServiceProvider provider = services.BuildServiceProvider();
 
         var worker = new WorkerSynchronizeUserDb(jobMock, provider,loggerMock);
@@ -63,9 +63,10 @@ public class WorkerSynchronizeDbUnitario
 
         //// Act
         await worker.StartAsync(cts.Token);
+        await Task.Delay(TimeSpan.FromSeconds(3));
 
         //// Assert
-       await dbMock.Received().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await dbMock.Received().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -82,7 +83,7 @@ public class WorkerSynchronizeDbUnitario
            f.Internet.Email()
        )).Generate(1);
 
-        var jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.User>>>();
+        var jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
 
         jobMock.ReadAllAsync(Arg.Any<CancellationToken>())
                .Returns(ToAsyncEnumerable(usuarios, SyncOperation.Create));
@@ -119,14 +120,14 @@ public class WorkerSynchronizeDbUnitario
     {
         // Arrange
 
-        var jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.User>>>();
+        var jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
 
         jobMock.ReadAllAsync(Arg.Any<CancellationToken>())
                .Returns(ToAsyncEnumerable(new List<Domain.Entity.User>(), SyncOperation.Create));
 
         var dbMock = Substitute.For<IReadDbContext>();
 
-        var loggerMock = Substitute.For<Microsoft.Extensions.Logging.ILogger<WorkerSynchronizeUserDb>>();
+        var loggerMock = Substitute.For<ILogger<WorkerSynchronizeUserDb>>();
 
 
         var services = new ServiceCollection();
@@ -162,15 +163,15 @@ public class WorkerSynchronizeDbUnitario
                 Guid.NewGuid()
             )).Generate(count);
 
-        var jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.Perfil>>>();
+        var jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.Perfil>>>();
         jobMock.ReadAllAsync(Arg.Any<CancellationToken>())
                .Returns(ToAsyncEnumerable(perfils, SyncOperation.Create));
 
         var dbMock = Substitute.For<IReadDbContext>();
-        var loggerMock = Substitute.For<Microsoft.Extensions.Logging.ILogger<WorkerSynchronizePerfilDb>>();
+        var loggerMock = Substitute.For<ILogger<WorkerSynchronizePerfilDb>>();
 
         var services = new ServiceCollection();
-        services.AddScoped<IReadDbContext>(_ => dbMock);
+        services.AddScoped(_ => dbMock);
         IServiceProvider provider = services.BuildServiceProvider();
 
         var worker = new WorkerSynchronizePerfilDb(jobMock, provider, loggerMock);
@@ -200,7 +201,7 @@ public class WorkerSynchronizeDbUnitario
                   Guid.NewGuid()
               )).Generate(1);
 
-        var jobMock = Substitute.For<IQueryJobSynchronize<SyncData<Domain.Entity.Perfil>>>();
+        var jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.Perfil>>>();
         jobMock.ReadAllAsync(Arg.Any<CancellationToken>())
                .Returns(ToAsyncEnumerable(perfils, SyncOperation.Create));
 

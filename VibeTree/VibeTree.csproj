@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,11 +13,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MySql.Data" Version="9.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VibeTree.Application\VibeTree.Application.csproj" />
     <ProjectReference Include="..\VibeTree.Infrastructure\VibeTree.Infrastructure.csproj" />
+	  
   </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="VibeTree.Test" />
+	</ItemGroup>
 
 </Project>

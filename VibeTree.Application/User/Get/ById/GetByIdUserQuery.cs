@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Result;
-using VibeTree.Application.User;
+using VibeTree.Domain;
 
-namespace VibeTree.User.CreateUser;
+namespace VibeTree.Application.User.Get.ById;
 
-public record class CreateUserCommand(string Name,string Password,string Email) :IRequest<Userlogin>;
-
+public record GetByIdUserQuery(string id):IRequest<UserResponse>;
 
 

@@ -11,7 +11,9 @@ public class User : EntityBase
     public string Name { get; private set ; } 
     public string PasswordHash { get; private set; }
     public string Email { get; private set; }
-    public virtual ICollection<Link> Links { get; }
+    public virtual ICollection<Link> Links { get; private set; }
+
+    public virtual Perfil Perfil { get; private  set; }
 
     private User() : base() { }
     
@@ -35,7 +37,7 @@ public class User : EntityBase
     
 
     public void setPasswordHash(string? PasswordHash )=>
-        this.PasswordHash = string.IsNullOrEmpty(PasswordHash) ?this.PasswordHash : BCrypt.Net.BCrypt.HashPassword(PasswordHash);
+        this.PasswordHash = string.IsNullOrWhiteSpace(PasswordHash) ?this.PasswordHash : BCrypt.Net.BCrypt.HashPassword(PasswordHash);
 
     
 }

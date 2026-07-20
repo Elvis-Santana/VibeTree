@@ -24,12 +24,12 @@ public class WorkerSynchronizePerfilDb(
 
     protected async override Task Processing(IEnumerable<SyncData<Perfil>> data, CancellationToken cancellationToken, IServiceProvider serviceProvider)
     {
-        using var scope = serviceProvider.CreateScope();
-        var _service = scope.ServiceProvider.GetRequiredService<IReadDbContext>();
-
         try
         {
-            var toInsert = data.Where(a => a.Operation.Equals(SyncOperation.Create)).Select(a => a.Item);
+            using var scope = serviceProvider.CreateScope();
+            var _service = scope.ServiceProvider.GetRequiredService<IReadDbContext>();
+
+            var toInsert = data.Where(a => a.Operation.Equals(SyncOperation.Create)).Select(a => a.Item).ToList();
             if (toInsert.Any())
                 await _service.perfils.AddRangeAsync(toInsert, cancellationToken);
             await _service.SaveChangesAsync(cancellationToken);

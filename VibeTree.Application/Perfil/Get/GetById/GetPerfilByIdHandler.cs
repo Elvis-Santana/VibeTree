@@ -16,7 +16,7 @@ public partial class GetPerfilByIdHandler(IReadDbContext appDbContext) : IHandle
 
        var result = await appDbContext
             .perfils
-            .FirstOrDefaultAsync(p => p.Id.Equals(Guid.Parse(command.id)));
+            .FindAsync(Guid.Parse(command.id));
 
         return result is null
           ? new Error("perfil não encontrado")

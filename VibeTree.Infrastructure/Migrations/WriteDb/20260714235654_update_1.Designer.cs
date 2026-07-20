@@ -9,11 +9,11 @@ using VibeTree.Infrastructure.AppDbContext;
 
 #nullable disable
 
-namespace VibeTree.Infrastructure.Migrations
+namespace VibeTree.Infrastructure.Migrations.WriteDb
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20260531154708_init")]
-    partial class init
+    [Migration("20260714235654_update_1")]
+    partial class update_1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,10 +105,15 @@ namespace VibeTree.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
+                    b.Property<Guid>("PerfilId")
+                        .HasColumnType("char(36)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PerfilId");
 
                     b.ToTable("Users");
                 });
@@ -129,6 +134,17 @@ namespace VibeTree.Infrastructure.Migrations
                         .HasForeignKey("VibeTree.Domain.Entity.Perfil", "IdUser")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>
+                {
+                    b.HasOne("VibeTree.Domain.Entity.Perfil", "Perfil")
+                        .WithMany()
+                        .HasForeignKey("PerfilId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>

@@ -3,14 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace VibeTree.Application.Result;
 
 
-public record  Result(bool IsSuccess, List<Error>? Errors = default)
+
+public record Result  
 {
-    public static Result Success() => new Result(true, null);
+    [JsonConstructor]
+    protected Result() { }
+
+    public Result(bool IsSuccess, List<Error>? Errors = default)
+    {
+        this.Errors = Errors ?? new List<Error>();
+        this.IsSuccess = IsSuccess;
+    }
+    public List<Error>? Errors { get; init; } = default;
+    public bool IsSuccess { get; init; }
+
+    public static Result Success() => new (true, null);
 
     public static Result Failure(List<Error> errors) => new Result(false, errors);
 
@@ -20,11 +33,12 @@ public record  Result(bool IsSuccess, List<Error>? Errors = default)
     public static implicit operator Result(Error error) => Failure(error);
 }
 
-public record  Result<T>: Result
+public record  Result<T> : Result
 {
     public T Value { get; } = default!;
 
-    private Result(T value) : base(true, null) => this.Value = value;
+    [JsonConstructor]
+    protected Result(T value) : base(true, null) => this.Value = value;
 
     public Result(List<Error> error) : base(false, error) { }
 

@@ -1,13 +1,7 @@
 ﻿using Bogus;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Mediator;
+using VibeTree.Application.Interfaces;
 using VibeTree.Application.Perfil;
-using VibeTree.Application.Perfil.Create;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Result;
 using VibeTree.Domain.Entity;
@@ -21,7 +15,7 @@ public class GetPerfilByIdHandlerTest
     public async Task GetPerfilByIdHandler_Should_QueryById_Perfil()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+          var context = await db.CriarContextoReadPreparadoAsync();
 
         Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
             .CustomInstantiator(f => new(Guid.NewGuid(),
@@ -63,7 +57,7 @@ public class GetPerfilByIdHandlerTest
     public async Task GetPerfilByIdHandler_Should_Not_Found_Perfil()
     {
         await using var db = new DbContextBuildConfig();
-        await using var context = await db.CriarContextoPreparadoAsync();
+         var context = await db.CriarContextoReadPreparadoAsync();
 
         IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilByIdHandler(context));
 

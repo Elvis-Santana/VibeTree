@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VibeTree.Infrastructure.AppDbContext;
 
 #nullable disable
 
-namespace VibeTree.Infrastructure.Migrations.ReadDb
+namespace VibeTree.Infrastructure.Migrations
 {
     [DbContext(typeof(ReadDbContext))]
-    partial class ReadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260715000820_update_2")]
+    partial class update_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,10 +105,15 @@ namespace VibeTree.Infrastructure.Migrations.ReadDb
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
+                    b.Property<Guid>("PerfilId")
+                        .HasColumnType("char(36)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PerfilId");
 
                     b.ToTable("Users");
                 });
@@ -124,8 +132,18 @@ namespace VibeTree.Infrastructure.Migrations.ReadDb
                     b.HasOne("VibeTree.Domain.Entity.User", null)
                         .WithOne()
                         .HasForeignKey("VibeTree.Domain.Entity.Perfil", "IdUser")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>
+                {
+                    b.HasOne("VibeTree.Domain.Entity.Perfil", "Perfil")
+                        .WithMany()
+                        .HasForeignKey("PerfilId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>

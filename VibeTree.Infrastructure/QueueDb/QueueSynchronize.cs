@@ -11,10 +11,10 @@ using VibeTree.Domain.Entity;
 
 namespace VibeTree.Infrastructure.Query;
 
-public class QueueSynchronizePerfilDb : IQueueSynchronizeDb<SyncData<Perfil>>
+public class QueueSynchronize<T> : IQueueSynchronizeDb<SyncData<T>>
 {
 
-    private readonly Channel<SyncData<Perfil>> _channel  = Channel.CreateBounded<SyncData<Perfil>>(new BoundedChannelOptions(1_000)
+    private readonly Channel<SyncData<T>> _channel  = Channel.CreateBounded<SyncData<T>>(new BoundedChannelOptions(1_000)
     {
         SingleWriter = true,
         FullMode = BoundedChannelFullMode.Wait
@@ -22,12 +22,12 @@ public class QueueSynchronizePerfilDb : IQueueSynchronizeDb<SyncData<Perfil>>
 
     public bool HasPending => _channel.Reader.TryPeek(out _);
 
-    public ValueTask AddJobAsync(SyncData<Perfil> jobSynchronize, CancellationToken cancellationToken = default)
+    public ValueTask AddJobAsync(SyncData<T> jobSynchronize, CancellationToken cancellationToken = default)
         => _channel.Writer.WriteAsync(jobSynchronize, cancellationToken);
 
 
 
-    public  IAsyncEnumerable<SyncData<Perfil>> ReadAllAsync(CancellationToken cancellationToken)
+    public  IAsyncEnumerable<SyncData<T>> ReadAllAsync(CancellationToken cancellationToken)
         =>  _channel.Reader.ReadAllAsync(cancellationToken);
     
 }

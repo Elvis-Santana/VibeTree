@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Result;
-using VibeTree.Application.User.Get;
+﻿using VibeTree.Application.Result;
 
 namespace VibeTree.Application.Interfaces;
 

@@ -6,6 +6,7 @@ using System.Text.Json;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
+using VibeTree.Infrastructure.AppDbContext;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VibeTree.Infrastructure.Worker;
@@ -21,17 +22,27 @@ public class WorkerSynchronizeUserDb(
 
     protected async override Task Processing(IEnumerable<SyncData<Domain.Entity.User>> data, CancellationToken cancellationToken, IServiceProvider serviceProvider)
     {
-        using var scope = serviceProvider.CreateScope();
-        var _service = scope.ServiceProvider.GetRequiredService<IReadDbContext>();
-
+     
         try
         {
-           var toInsert = data.Where(a => a.Operation.Equals(SyncOperation.Create)).Select(a => a.Item);
-            if (toInsert.Any())
-                await _service.Users.AddRangeAsync(toInsert, cancellationToken);
+           using var scope = serviceProvider.CreateScope();
+           var _service = scope.ServiceProvider.GetRequiredService<IReadDbContext>();
+
+           var toInsertCreate = data.Where(a => a.Operation.Equals(SyncOperation.Create)).Select(a => a.Item).ToList();
+           var toInsertUpdate = data.Where(a => a.Operation.Equals(SyncOperation.Update)).Select(a => a.Item).ToList();
+
+           //var toInsertDelete = data.Where(a => a.Operation.Equals(SyncOperation.Delete)).Select(a => a.Item);
+            if (toInsertCreate.Any())
+                await _service.Users.AddRangeAsync(toInsertCreate, cancellationToken);
+
+            if (toInsertUpdate.Any())
+                 _service.Users.UpdateRange(toInsertUpdate);
 
 
-            await _service.SaveChangesAsync(cancellationToken);
+
+            if (toInsertCreate.Any() || toInsertUpdate.Any())
+                await _service.SaveChangesAsync(cancellationToken);
+           
         }
         catch (Exception ex)
         {

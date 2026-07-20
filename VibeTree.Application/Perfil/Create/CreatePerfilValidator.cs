@@ -24,5 +24,7 @@ public class CreatePerfilValidator : AbstractValidator<CreatePerfilCommand>
           .NotEmpty()
           .WithMessage(Error.CorEmpty.Message);
 
+      
+
     }
 }

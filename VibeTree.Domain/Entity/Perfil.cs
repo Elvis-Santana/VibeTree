@@ -8,13 +8,13 @@ namespace VibeTree.Domain.Entity;
 
 public class Perfil : EntityBase
 {
-    public string Cor { get;  }
-    public string Descricao { get; }
-    public string ImagemUrl { get; }
+    public string Cor { get; private set; }
+    public string Descricao { get; private set; }
+    public string ImagemUrl { get; private set; }
 
-    public string Slug { get; }
+    public string Slug { get; private set; }
 
-    public Guid IdUser { get; }
+    public Guid IdUser { get; private set; }
 
     private Perfil() : base() { }
 

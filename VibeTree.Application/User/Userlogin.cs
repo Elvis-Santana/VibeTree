@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Auth;
+using VibeTree.Application.Interfaces;
 
 namespace VibeTree.Application.User;
 

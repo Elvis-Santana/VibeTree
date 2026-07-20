@@ -9,11 +9,11 @@ using VibeTree.Infrastructure.AppDbContext;
 
 #nullable disable
 
-namespace VibeTree.Infrastructure.Migrations.ReadDb
+namespace VibeTree.Infrastructure.Migrations.WriteDb
 {
-    [DbContext(typeof(ReadDbContext))]
-    [Migration("20260531154916_Init")]
-    partial class Init
+    [DbContext(typeof(WriteDbContext))]
+    [Migration("20260715002338_update_3")]
+    partial class update_3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,7 +44,6 @@ namespace VibeTree.Infrastructure.Migrations.ReadDb
             modelBuilder.Entity("VibeTree.Domain.Entity.Perfil", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Cor")
@@ -85,7 +84,6 @@ namespace VibeTree.Infrastructure.Migrations.ReadDb
             modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -125,15 +123,17 @@ namespace VibeTree.Infrastructure.Migrations.ReadDb
             modelBuilder.Entity("VibeTree.Domain.Entity.Perfil", b =>
                 {
                     b.HasOne("VibeTree.Domain.Entity.User", null)
-                        .WithOne()
+                        .WithOne("Perfil")
                         .HasForeignKey("VibeTree.Domain.Entity.Perfil", "IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("VibeTree.Domain.Entity.User", b =>
                 {
                     b.Navigation("Links");
+
+                    b.Navigation("Perfil")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

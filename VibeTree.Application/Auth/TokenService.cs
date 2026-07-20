@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using VibeTree.Application.Auth.ValueObject;
 using VibeTree.User.CreateUser;
 
 namespace VibeTree.Application.Auth;
@@ -25,17 +27,17 @@ public class TokenService : ITokenService
     }
 
 
-    public Task<Token> CriarToken(Domain.Entity.User user)
+    public Task<Token> CriarToken(Domain.Entity.User user, Domain.Entity.Perfil perfil)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-
         var key = Encoding.UTF8.GetBytes(_secretKey);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity([
-                new(ClaimTypes.Email, user.Email),
-                new(ClaimTypes.NameIdentifier,user.Id.ToString())
+                new("sub",user.Id.ToString()),
+                new(ClaimsValue.idPerfil,perfil.Id.ToString()),
+
             ]),
             Expires = DateTime.UtcNow.AddHours(8),
             SigningCredentials = new SigningCredentials(

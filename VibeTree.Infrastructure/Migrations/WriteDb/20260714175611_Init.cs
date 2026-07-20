@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace VibeTree.Infrastructure.Migrations.ReadDb
+namespace VibeTree.Infrastructure.Migrations.WriteDb
 {
     /// <inheritdoc />
     public partial class Init : Migration

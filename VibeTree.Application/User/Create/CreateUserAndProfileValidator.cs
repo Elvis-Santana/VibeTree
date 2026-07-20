@@ -1,18 +1,12 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VibeTree.Application.Result;
-using VibeTree.Application.User.Login;
 
 namespace VibeTree.User.CreateUser;
 
-public class CreateUserValidator : AbstractValidator<CreateUserCommand>
+public class CreateUserAndProfileValidator : AbstractValidator<CreateUserAndProfileCommand>
 {
 
-    public CreateUserValidator()
+    public CreateUserAndProfileValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(Error.NameEmpty.Message)
@@ -26,6 +20,10 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage(Error.PasswordEmpty.Message)
             .MinimumLength(6).WithMessage(Error.PasswordMinimumLength.Message);
+
+        RuleFor(p => p.Slug)
+        .NotEmpty()
+        .WithMessage(Error.SlugEmpty.Message);
     }
 
 }
