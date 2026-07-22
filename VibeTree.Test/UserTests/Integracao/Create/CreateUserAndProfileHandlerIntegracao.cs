@@ -11,7 +11,7 @@ using VibeTree.Infrastructure.AppDbContext;
 namespace VibeTree.Test.UserTests.Integracao.Create;
 
 [Collection(IntegrationCollection.Name)]
-public class CreateUserHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();

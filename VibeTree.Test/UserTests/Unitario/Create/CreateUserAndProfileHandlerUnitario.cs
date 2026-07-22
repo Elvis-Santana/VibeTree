@@ -24,7 +24,7 @@ using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Create;
 
-public class CreateUserHandlerUnitario
+public class CreateUserAndProfileHandlerUnitario
 {
     private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
 
