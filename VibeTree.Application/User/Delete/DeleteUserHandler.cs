@@ -1,14 +1,9 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
-using VibeTree.Application.Result;
-using VibeTree.User.CreateUser;
 
 namespace VibeTree.Application.User.Delete;
 
@@ -30,11 +25,18 @@ public class DeleteUserHandler(
         if (user is null)
             return Error.NotFound;
 
-        writeDbContext.Users.Remove(user);
-        bool isSave = await writeDbContext.SaveChangesAsync() >0 ;
-        await queryJobSynchronize.AddJobAsync(new (user,SyncOperation.Update));
+        try
+        {
+            writeDbContext.Users.Remove(user);
+            await writeDbContext.SaveChangesAsync();
+            await queryJobSynchronize.AddJobAsync(new(user, SyncOperation.Update));
+            return true;
 
+        }
+        catch (DbUpdateException)
+        {
+            return new Error("Não foi possível excluir o usuário devido a restrições no banco de dados.");
+        }
 
-        return isSave;
     }
 }
