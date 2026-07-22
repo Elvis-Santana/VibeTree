@@ -15,10 +15,9 @@ public class LoginHandler(
     IReadDbContext appDbContext,
     ITokenService tokenService,
     IValidator<LoginQuery> validator
-    ) : IHandler<LoginQuery, Userlogin>
-{
+    ){
 
-    public async Task<Result<Userlogin>> HandleAsync(LoginQuery query)
+    public async Task<Result<Userlogin>> Handle(LoginQuery query)
     {
 
         var validationResult =await  validator.ValidateAsync(query);

@@ -3,10 +3,10 @@ using VibeTree.Application.Interfaces;
 
 namespace VibeTree.Application.Perfil.Get.GetById;
 
-public partial class GetPerfilByIdHandler(IReadDbContext appDbContext) : IHandler<GetPerfilByIdQuery, PerfilResponse>
+public partial class GetPerfilByIdHandler(IReadDbContext appDbContext) 
 {
 
-    public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilByIdQuery command)
+    public async Task<Result<PerfilResponse>> Handle(GetPerfilByIdQuery command)
     {
 
        var result = await appDbContext

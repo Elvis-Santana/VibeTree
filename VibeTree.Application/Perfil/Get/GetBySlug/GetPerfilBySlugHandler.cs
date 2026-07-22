@@ -4,9 +4,9 @@ using VibeTree.Application.Common;
 
 namespace VibeTree.Application.Perfil.Get.GetBySlug;
 
-public partial class GetPerfilBySlugHandler (IReadDbContext appDbContext) : IHandler<GetPerfilBySlugQuery, PerfilResponse>
+public partial class GetPerfilBySlugHandler (IReadDbContext appDbContext) 
 {
-    public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilBySlugQuery command)
+    public async Task<Result<PerfilResponse>> Handle(GetPerfilBySlugQuery command)
     {
         var result = await appDbContext
             .perfils
