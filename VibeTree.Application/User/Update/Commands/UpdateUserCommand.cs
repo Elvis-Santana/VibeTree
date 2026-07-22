@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 
-namespace VibeTree.Application.User.Update;
+namespace VibeTree.Application.User.Update.Commands;
 
 public record UpdateUserCommand(string Id,string? Name,  string? Email,string? Password) :IRequest<Userlogin>;
 

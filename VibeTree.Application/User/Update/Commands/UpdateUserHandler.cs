@@ -13,18 +13,20 @@ using VibeTree.Application.Common;
 using VibeTree.Application.Sync;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using ValidationResult = FluentValidation.Results.ValidationResult;
+using Wolverine;
+using VibeTree.Application.User.Update.Events;
 
-namespace VibeTree.Application.User.Update;
+namespace VibeTree.Application.User.Update.Commands;
 
 public class UpdateUserHandler (
         IWriteDbContext writeDbContext,
         ITokenService tokenService,
         IValidator<UpdateUserCommand> validator,
-        IQueueSynchronizeDb<SyncData<Domain.Entity.User>> queryJobSynchronize
-    ) : IHandler<UpdateUserCommand, Userlogin>
+        IMessageBus bus
+    ) 
 {
 
-    public async Task<Result<Userlogin>> HandleAsync(UpdateUserCommand command)
+    public async Task<Result<Userlogin>> Handle(UpdateUserCommand command)
     {
         ValidationResult validationResult = await validator.ValidateAsync(command);
 
@@ -46,7 +48,7 @@ public class UpdateUserHandler (
                 ? (await tokenService.CriarToken(user, user.Perfil)).token 
                 : string.Empty;
 
-        await queryJobSynchronize.AddJobAsync(new SyncData<Domain.Entity.User>(user, SyncOperation.Update));
+        await bus.PublishAsync(new SyncUserUpdateEvent(user));
         return new Userlogin(user.Id, user.Name, user.Email, tokem);
     }
 }

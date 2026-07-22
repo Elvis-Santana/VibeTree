@@ -4,23 +4,30 @@ using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
+using VibeTree.Application.User.Delete.Events;
+using Wolverine;
 
-namespace VibeTree.Application.User.Delete;
+namespace VibeTree.Application.User.Delete.Commands;
 
-public class DeleteUserHandler(
-     IWriteDbContext writeDbContext,
-     IValidator<DeleteUserCommand> validator,
-     IQueueSynchronizeDb<SyncData<Domain.Entity.User>> queryJobSynchronize
-    ) : IHandler<DeleteUserCommand, bool>
+public static class DeleteUserHandler
 {
-    public async Task<Result<bool>> HandleAsync(DeleteUserCommand command)
+    public static async Task<Result<bool>> Handle(
+         this DeleteUserCommand command,
+         IWriteDbContext writeDbContext,
+         IValidator<DeleteUserCommand> validator,
+         IMessageBus bus
+    )
     {
        var validationResult = await validator.ValidateAsync( command );
 
         if(!validationResult.IsValid)
             return validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList();
 
-         Domain.Entity.User? user =  await writeDbContext.Users.FindAsync(Guid.Parse(command.Id));
+        if (!Guid.TryParse(command.Id, out var id))
+            return Error.IdValid;
+
+       
+        Domain.Entity.User? user =  await writeDbContext.Users.FindAsync(id);
 
         if (user is null)
             return Error.NotFound;
@@ -29,7 +36,7 @@ public class DeleteUserHandler(
         {
             writeDbContext.Users.Remove(user);
             await writeDbContext.SaveChangesAsync();
-            await queryJobSynchronize.AddJobAsync(new(user, SyncOperation.Update));
+            await bus.PublishAsync(new SyncUserDeleteEvent(user));
             return true;
 
         }

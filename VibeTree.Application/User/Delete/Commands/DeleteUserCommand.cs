@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 
-namespace VibeTree.Application.User.Delete;
+namespace VibeTree.Application.User.Delete.Commands;
 
-public record class DeleteUserCommand(string Id):IRequest<bool>;
+public record class DeleteUserCommand(string Id);
 
