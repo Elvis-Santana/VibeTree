@@ -1,18 +1,24 @@
+using JasperFx;
+using JasperFx.CodeGeneration;
+using JasperFx.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Org.BouncyCastle.Tls;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using VibeTree.Application.Common;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.Result;
 using VibeTree.Application.Sync;
 using VibeTree.Application.User;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Application.User.Delete;
 using VibeTree.Application.User.Get.ById;
 using VibeTree.Application.User.Login;
@@ -22,7 +28,8 @@ using VibeTree.Infrastructure.AppDbContext;
 using VibeTree.Infrastructure.Mediator;
 using VibeTree.Infrastructure.Query;
 using VibeTree.Infrastructure.Worker;
-using VibeTree.User.CreateUser;
+using Wolverine;
+using Wolverine.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,26 +38,20 @@ var builder = WebApplication.CreateBuilder(args);
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddOpenApi();
+
+string connectionWrite = builder.Configuration.GetConnectionString("WriteDb") ?? throw new ArgumentException();
+
 builder.Services.AddDbContext<WriteDbContext>(optionsAction =>
-{
-    string connection = builder.Configuration
-    .GetConnectionString("WriteDb") ?? throw new ArgumentException();
-
-    optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
-   
-
-});
-builder.Services.AddDbContext<ReadDbContext>(optionsAction =>
-{
-    string connection = builder.Configuration
-    .GetConnectionString("ReadDb") ?? throw new ArgumentException();
-
-    optionsAction.UseMySql(connection, ServerVersion.AutoDetect(connection));
-
-});
+    optionsAction.UseMySql(connectionWrite, ServerVersion.AutoDetect(connectionWrite))
+);
 
 builder.Services.AddScoped<IWriteDbContext, WriteDbContext>();
 
+string connectionRead = builder.Configuration.GetConnectionString("ReadDb") ?? throw new ArgumentException();
+
+builder.Services.AddDbContext<ReadDbContext>(optionsAction =>
+    optionsAction.UseMySql(connectionRead, ServerVersion.AutoDetect(connectionRead))
+);
 builder.Services.AddScoped<IReadDbContext, ReadDbContext>();
 
 builder.Services.AddOpenApi(optionsAction =>
@@ -96,6 +97,29 @@ builder.Services.AddOpenApi(optionsAction =>
 builder.Services.ConfigureServicesApplication(builder.Configuration);
 
 
+builder.Host.UseWolverine(opts =>
+{
+    opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
+
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IWriteDbContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IReadDbContext>();
+
+    if (builder.Environment.IsDevelopment())
+    {
+        opts.UseRuntimeCompilation();
+    }
+});
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.CritterStackDefaults(opts =>
+    {
+        opts.Production.GeneratedCodeMode = TypeLoadMode.Static;
+        opts.Production.AssertAllPreGeneratedTypesExist = true;
+    });
+}
+
+
 builder.Services.AddHostedService<WorkerSynchronizeUserDb>();
 builder.Services.AddHostedService<WorkerSynchronizePerfilDb>();
 builder.Services.AddSingleton<IQueueSynchronizeDb<SyncData<User>>, QueueSynchronize<User>>();
@@ -114,6 +138,8 @@ builder.Services.AddCors(op =>
 
     });
 });
+
+
 
 var app = builder.Build();
 
@@ -152,10 +178,11 @@ app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string s
 });
 
 
-app.MapPost("/user", async ([FromServices] IMediator mediator,
+app.MapPost("/user", async (IMessageBus bus,
     [FromBody] CreateUserAndProfileCommand createUserCommand) => {
 
-        Result<Userlogin> result = await mediator.SendAsync(createUserCommand);
+        Result<Userlogin> result = await bus.InvokeAsync<Result<Userlogin>>(createUserCommand);
+
 
         if (!result.IsSuccess)
             return Results.BadRequest(result);
@@ -218,11 +245,11 @@ app.MapGet("/user/me", async( [FromServices] IMediator mediator, ClaimsPrincipal
 
     return Results.Ok(result);
 
-}).RequireAuthorization(); 
+}).RequireAuthorization();
 
 
 
 
-app.Run();
+return await app.RunJasperFxCommands(args);
 
 public partial class Program { }
