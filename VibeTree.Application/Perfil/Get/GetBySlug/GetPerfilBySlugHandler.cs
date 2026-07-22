@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 
 namespace VibeTree.Application.Perfil.Get.GetBySlug;
 

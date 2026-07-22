@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.User.Delete;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 

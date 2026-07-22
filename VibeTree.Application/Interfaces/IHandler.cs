@@ -1,4 +1,4 @@
-﻿using VibeTree.Application.Result;
+﻿using VibeTree.Application.Common;
 
 namespace VibeTree.Application.Interfaces;
 

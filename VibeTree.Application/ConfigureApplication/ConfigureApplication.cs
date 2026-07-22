@@ -9,10 +9,10 @@ using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.User;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Application.User.Get.ById;
 using VibeTree.Application.User.Login;
 using VibeTree.Application.User.Update;
-using VibeTree.User.CreateUser;
 namespace VibeTree.Application.ConfigureApplication;
 
 public static class ConfigureApplication
@@ -24,7 +24,7 @@ public static class ConfigureApplication
         ConfigJWT(services,  configuration);
 
         services.AddScoped<ITokenService, TokenService>();
-        services.AddTransient<IHandler<CreateUserAndProfileCommand, Userlogin>, CreateUserAndProfileHandler>();
+        //services.AddTransient<IHandler<CreateUserAndProfileCommand, Userlogin>, CreateUserAndProfileHandler>();
         services.AddTransient<IHandler<UpdateUserCommand, Userlogin>, UpdateUserHandler>();
         services.AddTransient<IHandler<GetByIdUserQuery, UserResponse>, GetByIdUserHandler>();
         services.AddTransient<IHandler<LoginQuery, Userlogin>, LoginHandler>();

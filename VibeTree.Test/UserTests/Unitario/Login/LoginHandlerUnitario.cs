@@ -4,18 +4,11 @@ using FluentValidation;
 using FluentValidation.Results;
 using MockQueryable.NSubstitute;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
 using VibeTree.Domain.Entity;
-using VibeTree.User.CreateUser;
 using BCryptNet = BCrypt.Net.BCrypt;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 

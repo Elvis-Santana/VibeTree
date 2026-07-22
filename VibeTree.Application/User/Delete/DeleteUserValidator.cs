@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 
 namespace VibeTree.Application.User.Delete;
 

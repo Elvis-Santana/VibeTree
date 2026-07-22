@@ -1,21 +1,10 @@
 ﻿using Bogus;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Auth;
+using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
-using VibeTree.Application.Result;
-using VibeTree.Application.User;
 using VibeTree.Application.User.Delete;
-using VibeTree.Application.User.Update;
 using VibeTree.Infrastructure.Query;
 
 namespace VibeTree.Test.UserTests.Integracao.Delete;

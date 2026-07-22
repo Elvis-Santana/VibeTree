@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.User;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Infrastructure.AppDbContext;
-using VibeTree.User.CreateUser;
 namespace VibeTree.Test.UserTests.Integracao.Create;
 
 [Collection(IntegrationCollection.Name)]
@@ -32,8 +32,16 @@ public class CreateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
     private static async Task ClearDataAsync(DbContext db)
     {
 
-        await db.Database.EnsureDeletedAsync();
-        await db.Database.EnsureCreatedAsync();
+        if (db is WriteDbContext writeDb)
+        {
+            writeDb.Users.RemoveRange(writeDb.Users);
+            await writeDb.SaveChangesAsync();
+        }
+        else if (db is ReadDbContext readDb)
+        {
+            readDb.Users.RemoveRange(readDb.Users);
+            await readDb.SaveChangesAsync();
+        }
     }
 
     [Fact]
@@ -55,15 +63,28 @@ public class CreateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
         result.Value.Email.Should().Be(command.Email);
         result.Value.Token.Should().NotBeNullOrWhiteSpace();
 
-        using var scope = _factory.Services.CreateScope();
-        using var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+        using (var scope = _factory.Services.CreateScope())
+        {
+            using var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
 
-        var savedUser = await readDb.Users
-            .FirstOrDefaultAsync(u => u.Email == command.Email);
+                var savedUserRead = await readDb.Users
+                .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
 
-        savedUser.Should().NotBeNull();
-        savedUser!.Name.Should().Be(command.Name);
-        BCrypt.Net.BCrypt.Verify(plainPassword, savedUser.PasswordHash).Should().BeTrue();
+                savedUserRead.Should().NotBeNull();
+                savedUserRead!.Name.Should().Be(command.Name);
+                BCrypt.Net.BCrypt.Verify(plainPassword, savedUserRead.PasswordHash).Should().BeTrue();
+
+            using var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+                var savedUserWrite = await writeDb.Users
+                .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
+
+                savedUserWrite.Should().NotBeNull();
+                savedUserWrite!.Name.Should().Be(command.Name);
+                BCrypt.Net.BCrypt.Verify(plainPassword, savedUserWrite.PasswordHash).Should().BeTrue();
+            
+        }
+       
+
     }
 
     [Fact]

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Get.ById;
 

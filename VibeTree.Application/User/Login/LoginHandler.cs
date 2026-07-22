@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using BCryptNet = BCrypt.Net.BCrypt;
 namespace VibeTree.Application.User.Login;
 

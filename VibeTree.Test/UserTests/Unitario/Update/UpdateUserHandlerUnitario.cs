@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.Sync;
 using VibeTree.Application.User.Update;
 using VibeTree.Domain.Entity;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.Sync;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using ValidationResult = FluentValidation.Results.ValidationResult;

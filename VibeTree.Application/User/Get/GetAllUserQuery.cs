@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Domain;
 
 namespace VibeTree.Application.User.Get;

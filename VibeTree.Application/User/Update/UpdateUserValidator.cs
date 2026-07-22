@@ -1,13 +1,5 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.User.CreateUser;
-using VibeTree.Application.Result;
-using System.ComponentModel.DataAnnotations;
-using FluentValidation.Validators;
+using VibeTree.Application.Common;
 
 namespace VibeTree.Application.User.Update;
 

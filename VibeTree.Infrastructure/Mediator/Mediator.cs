@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
 
 namespace VibeTree.Infrastructure.Mediator;
 

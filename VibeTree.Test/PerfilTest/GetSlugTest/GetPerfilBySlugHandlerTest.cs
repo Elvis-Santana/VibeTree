@@ -3,7 +3,7 @@ using FluentAssertions;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Domain.Entity;
 
 namespace VibeTree.Test.PerfilTest.GetSlugTest;

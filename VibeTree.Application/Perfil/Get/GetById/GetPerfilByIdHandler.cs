@@ -1,16 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Result;
 
 namespace VibeTree.Application.Perfil.Get.GetById;
 
 public partial class GetPerfilByIdHandler(IReadDbContext appDbContext) : IHandler<GetPerfilByIdQuery, PerfilResponse>
 {
+
     public async Task<Result<PerfilResponse>> HandleAsync(GetPerfilByIdQuery command)
     {
 

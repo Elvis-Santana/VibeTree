@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VibeTree.Application.Result;
+namespace VibeTree.Application.Common;
 
 public  record  Error(string Message)
 {

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Json;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
 using VibeTree.Domain.Entity;

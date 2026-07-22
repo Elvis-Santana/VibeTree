@@ -1,14 +1,8 @@
 ﻿using Bogus;
-using Bogus.DataSets;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Application.User.Delete;
 using VibeTree.Application.User.Update;
-using VibeTree.User.CreateUser;
 
 namespace VibeTree.Test.UserTests.Unitario.Validate;
 

@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using VibeTree.Application.Auth;
-using VibeTree.Application.Result;
+using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;

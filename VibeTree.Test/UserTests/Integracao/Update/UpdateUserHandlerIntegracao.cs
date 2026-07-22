@@ -1,30 +1,15 @@
 ﻿using Bogus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Auth;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Result;
-using VibeTree.Application.Sync;
+using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Update;
 using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;
-using VibeTree.Infrastructure.Query;
-using VibeTree.User.CreateUser;
 
 namespace VibeTree.Test.UserTests.Integracao.Update;
 
