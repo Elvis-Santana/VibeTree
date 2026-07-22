@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User.Create.Commands;
+using VibeTree.Application.User.Delete.Commands;
+using VibeTree.Application.User.Update.Commands;
 using VibeTree.Infrastructure.AppDbContext;
 using Wolverine;
 
@@ -72,6 +74,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
             {
                 opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
                 opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
+                opts.Discovery.IncludeAssembly(typeof(DeleteUserCommand).Assembly);
+                opts.Discovery.IncludeAssembly(typeof(UpdateUserCommand).Assembly);
 
             });
   
