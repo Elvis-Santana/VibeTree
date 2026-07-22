@@ -1,22 +1,15 @@
-﻿using Bogus;
-using FluentAssertions;
+﻿using FluentAssertions;
+using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using System.Net;
-using System.Net.Http.Json;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Sync;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Infrastructure.AppDbContext;
-using VibeTree.Infrastructure.Query;
-using VibeTree.User.CreateUser;
+using Wolverine;
 
 namespace VibeTree.Test;
 
@@ -41,30 +34,21 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
     {
         builder.UseEnvironment("Development");
 
-        builder.ConfigureServices(async services =>
+        builder.ConfigureServices(services =>
         {
-        //services.RemoveAll(typeof(DbContextOptions<ReadDbContext>));
-        //services.RemoveAll(typeof(DbContextOptions<WriteDbContext>));
-        //services.RemoveAll(typeof(DbContextOptions));
-        //services.RemoveAll(typeof(ReadDbContext));
-        //services.RemoveAll(typeof(WriteDbContext));
-        //services.RemoveAll(typeof(IReadDbContext));
-        //services.RemoveAll(typeof(IWriteDbContext));
-        //services.RemoveAll(typeof(DbContext));
+  
+            var efServices = services.Where(d =>
+                d.ServiceType.FullName != null && (
+                d.ServiceType.FullName.StartsWith("Microsoft.EntityFrameworkCore") ||
+                d.ServiceType.FullName.StartsWith("Pomelo.EntityFrameworkCore") ||
+                d.ServiceType == typeof(DbContextOptions<WriteDbContext>) ||
+                d.ServiceType == typeof(DbContextOptions<ReadDbContext>) ||
+                d.ServiceType == typeof(WriteDbContext) ||
+                d.ServiceType == typeof(ReadDbContext) ||
+                d.ServiceType == typeof(IWriteDbContext) ||
+                d.ServiceType == typeof(IReadDbContext))
 
-
-        var efServices = services.Where(d =>
-            d.ServiceType.FullName != null && (
-            d.ServiceType.FullName.StartsWith("Microsoft.EntityFrameworkCore") ||
-            d.ServiceType.FullName.StartsWith("Pomelo.EntityFrameworkCore") ||
-            d.ServiceType == typeof(DbContextOptions<WriteDbContext>) ||
-            d.ServiceType == typeof(DbContextOptions<ReadDbContext>) ||
-            d.ServiceType == typeof(WriteDbContext) ||
-            d.ServiceType == typeof(ReadDbContext) ||
-            d.ServiceType == typeof(IWriteDbContext) ||
-            d.ServiceType == typeof(IReadDbContext))
-
-        ).ToList();
+            ).ToList();
 
             foreach (var service in efServices)
             {
@@ -84,18 +68,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
             services.AddScoped<IReadDbContext, ReadDbContext>();
 
 
+            services.Configure<WolverineOptions>(opts =>
+            {
+                opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
+                opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
 
-            //var sp = services.BuildServiceProvider();
-            //using var scope = sp.CreateScope();
+            });
+  
 
-            //var writeContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-            //writeContext.Database.EnsureCreated();
-
-            //var readContext = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
-            //readContext.Database.EnsureCreated();
-
-
-           
         });
     }
 
