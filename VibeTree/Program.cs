@@ -1,12 +1,9 @@
 using JasperFx;
 using JasperFx.CodeGeneration;
-using JasperFx.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Org.BouncyCastle.Tls;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using VibeTree.Application.Common;
@@ -19,17 +16,13 @@ using VibeTree.Application.Perfil.Get.GetBySlug;
 using VibeTree.Application.Sync;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Create.Commands;
-using VibeTree.Application.User.Delete;
+using VibeTree.Application.User.Delete.Commands;
 using VibeTree.Application.User.Get.ById;
 using VibeTree.Application.User.Login;
-using VibeTree.Application.User.Update;
+using VibeTree.Application.User.Update.Commands;
 using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;
-using VibeTree.Infrastructure.Mediator;
-using VibeTree.Infrastructure.Query;
-using VibeTree.Infrastructure.Worker;
 using Wolverine;
-using Wolverine.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +93,8 @@ builder.Services.ConfigureServicesApplication(builder.Configuration);
 builder.Host.UseWolverine(opts =>
 {
     opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
+    opts.Discovery.IncludeAssembly(typeof(DeleteUserCommand).Assembly);
+    opts.Discovery.IncludeAssembly(typeof(UpdateUserCommand).Assembly);
 
     opts.CodeGeneration.AlwaysUseServiceLocationFor<IWriteDbContext>();
     opts.CodeGeneration.AlwaysUseServiceLocationFor<IReadDbContext>();
@@ -120,11 +115,8 @@ if (!builder.Environment.IsDevelopment())
 }
 
 
-builder.Services.AddHostedService<WorkerSynchronizeUserDb>();
-builder.Services.AddHostedService<WorkerSynchronizePerfilDb>();
-builder.Services.AddSingleton<IQueueSynchronizeDb<SyncData<User>>, QueueSynchronize<User>>();
-builder.Services.AddSingleton<IQueueSynchronizeDb<SyncData<Perfil>>, QueueSynchronize<Perfil>>();
-builder.Services.AddScoped<IMediator, Mediator>();
+
+
 
 const string policy = "_myAllowSpecificOrigins";
 
@@ -159,18 +151,18 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapGet("/perfil/{id}",async([FromServices] IMediator mediator,string id) =>
+app.MapGet("/perfil/{id}",async(IMessageBus bus, string id) =>
 {
-    Result<PerfilResponse> result = await mediator.SendAsync(new GetPerfilByIdQuery(id));
+    Result<PerfilResponse> result = await bus.InvokeAsync<Result<PerfilResponse>>(new GetPerfilByIdQuery(id));
 
     if (!result.IsSuccess)
         return Results.NotFound(result);
     return Results.Ok(result);
 });
 
-app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string slug) =>
+app.MapGet("/perfil/@{slug}", async (IMessageBus bus, string slug) =>
 {
-    Result<PerfilResponse> result = await mediator.SendAsync(new GetPerfilBySlugQuery(slug));
+    Result<PerfilResponse> result = await bus.InvokeAsync<Result<PerfilResponse>> (new GetPerfilBySlugQuery(slug));
 
     if (!result.IsSuccess)
         return Results.NotFound(result);
@@ -178,8 +170,7 @@ app.MapGet("/perfil/@{slug}", async ([FromServices] IMediator mediator, string s
 });
 
 
-app.MapPost("/user", async (IMessageBus bus,
-    [FromBody] CreateUserAndProfileCommand createUserCommand) => {
+app.MapPost("/user", async (IMessageBus bus, [FromBody] CreateUserAndProfileCommand createUserCommand) => {
 
         Result<Userlogin> result = await bus.InvokeAsync<Result<Userlogin>>(createUserCommand);
 
@@ -191,10 +182,9 @@ app.MapPost("/user", async (IMessageBus bus,
         return Results.Ok(result);
 });
 
-app.MapPatch("/user", async ([FromServices] IMediator mediator,
-   [FromBody] UpdateUserCommand updateUserCommand) => {
+app.MapPatch("/user", async (IMessageBus bus,[FromBody] UpdateUserCommand updateUserCommand) => {
 
-        Result<Userlogin> result = await mediator.SendAsync(updateUserCommand);
+        Result<Userlogin> result = await bus.InvokeAsync<Result<Userlogin>>(updateUserCommand);
 
         if (!result.IsSuccess)
             return Results.BadRequest(result);
@@ -203,25 +193,22 @@ app.MapPatch("/user", async ([FromServices] IMediator mediator,
         return Results.Ok(result);
  });
 
-app.MapDelete("/user", async ([FromServices] IMediator mediator,
-    [FromBody] DeleteUserCommand deleteUserCommand) => {
+app.MapDelete("/user/{id}", async (IMessageBus bus,string id) => {
 
-        Result<bool> result = await mediator.SendAsync(deleteUserCommand);
+    Result<bool> result = await bus.InvokeAsync<Result<bool>>(new DeleteUserCommand(id));
 
-        if (!result.IsSuccess)
-            return Results.BadRequest(result);
+    if (!result.IsSuccess)
+        return Results.BadRequest(result);
 
 
-        return Results.Ok(result);
+    return Results.Ok(result);
 });
 
 
 
-app.MapPost("/auth/login", async (
-    [FromServices] IMediator mediator,
-    [FromBody] LoginQuery loginQuery) => {
+app.MapPost("/auth/login", async (IMessageBus bus, [FromBody] LoginQuery loginQuery) => {
 
-    var result = await mediator.SendAsync(loginQuery);
+        Result<Userlogin> result = await bus.InvokeAsync<Result<Userlogin>>(loginQuery);
 
     if (!result.IsSuccess)
         return Results.BadRequest(result);
@@ -231,13 +218,11 @@ app.MapPost("/auth/login", async (
 
 });
 
-app.MapGet("/user/me", async( [FromServices] IMediator mediator, ClaimsPrincipal user ) =>
+app.MapGet("/user/me", async(IMessageBus bus, ClaimsPrincipal user ) =>
 {
     var usuarioId =  user.FindFirstValue(ClaimTypes.NameIdentifier); ;
 
-    GetByIdUserQuery getByIdUserQuery = new GetByIdUserQuery(usuarioId);
-
-    var result = await mediator.SendAsync(getByIdUserQuery);
+    var result = await bus.InvokeAsync<Result<UserResponse>>(new GetByIdUserQuery(usuarioId));
 
     if (!result.IsSuccess)
         return Results.NotFound(result);
