@@ -42,10 +42,10 @@ public class GetPerfilByIdHandlerTest
         await context.perfils.AddAsync(perfil);
         await context.SaveChangesAsync();
 
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilByIdHandler(context));
 
         GetPerfilByIdQuery perfilByIdQuery = new (perfil.Id.ToString());
-        Result<PerfilResponse> result = await mediator.SendAsync(perfilByIdQuery);
+        Result<PerfilResponse> result = await new GetPerfilByIdHandler(context).Handle(perfilByIdQuery);
+
 
 
         result.IsSuccess.Should().BeTrue();
@@ -59,10 +59,9 @@ public class GetPerfilByIdHandlerTest
         await using var db = new DbContextBuildConfig();
          var context = await db.CriarContextoReadPreparadoAsync();
 
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilByIdHandler(context));
 
         GetPerfilByIdQuery perfilByIdQuery = new(Guid.NewGuid().ToString());
-        Result<PerfilResponse> result = await mediator.SendAsync(perfilByIdQuery);
+        Result<PerfilResponse> result = await new GetPerfilByIdHandler(context).Handle(perfilByIdQuery);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);

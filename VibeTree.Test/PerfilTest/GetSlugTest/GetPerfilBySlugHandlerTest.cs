@@ -42,10 +42,9 @@ public class GetPerfilBySlugHandlerTest
         await context.perfils.AddAsync(perfil);
         await context.SaveChangesAsync();
 
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilBySlugHandler(context));
 
         GetPerfilBySlugQuery perfilBySlug = new(perfil.Slug);
-        Result<PerfilResponse> result = await mediator.SendAsync(perfilBySlug);
+        Result<PerfilResponse> result = await new GetPerfilBySlugHandler(context).Handle(perfilBySlug);
 
 
         result.IsSuccess.Should().BeTrue();
@@ -60,10 +59,9 @@ public class GetPerfilBySlugHandlerTest
         var context = await db.CriarContextoReadPreparadoAsync();
 
      
-        IMediator mediator = FactoryMed.CreateMediatorWithHandler(new GetPerfilBySlugHandler(context));
 
         GetPerfilBySlugQuery perfilBySlug = new(Guid.NewGuid().ToString());
-        Result<PerfilResponse> result = await mediator.SendAsync(perfilBySlug);
+        Result<PerfilResponse> result = await new GetPerfilBySlugHandler(context).Handle(perfilBySlug);
 
 
         result.IsSuccess.Should().BeFalse();
