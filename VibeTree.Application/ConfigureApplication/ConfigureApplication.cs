@@ -35,6 +35,7 @@ public static class ConfigureApplication
         services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
         services.AddScoped<IValidator<CreateUserAndProfileCommand>, CreateUserAndProfileValidator>();
         services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
+        services.AddScoped<IValidator<DeleteUserCommand>, DeleteUserValidator>();
     }
 
     private static void ConfigJWT(IServiceCollection services , IConfiguration configuration)
