@@ -8,18 +8,20 @@ using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
 using VibeTree.Application.Common;
-using VibeTree.Application.User.Delete;
 using ValidationResult = FluentValidation.Results.ValidationResult;
+using VibeTree.Application.User.Delete.Commands;
+using Wolverine;
+using Spectre.Console.Rendering;
 
 namespace VibeTree.Test.UserTests.Unitario.Delete;
 
 public class DeleteUserHandlerUnitario
 {
     private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
-    private readonly IQueueSynchronizeDb<SyncData<Domain.Entity.User>> _jobMock = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
+    private readonly IMessageBus _busMock = Substitute.For<IMessageBus>();
     private readonly IValidator<DeleteUserCommand> _validatorMock = Substitute.For<IValidator<DeleteUserCommand>>();
 
-    public DeleteUserHandler DeleteHandler() => new DeleteUserHandler(_dbMock, _validatorMock, _jobMock  );
+    public Task<Result<bool>> DeleteHandler(DeleteUserCommand command) => DeleteUserHandler.Handle(command,_dbMock, _validatorMock, _busMock);
 
     [Fact]
     public async Task Handler_Deve_Retornar_Id_Vazio()
@@ -34,13 +36,12 @@ public class DeleteUserHandlerUnitario
 
         DeleteUserCommand deleteUserCommand = new (string.Empty);
 
-        var hanlder = await DeleteHandler().HandleAsync(deleteUserCommand);
+        var hanlder = await DeleteHandler(deleteUserCommand);
 
         hanlder.IsSuccess.Should().BeFalse();
         hanlder.Errors.Should().HaveCount(1);
 
         await _dbMock.DidNotReceive().SaveChangesAsync();
-        await _jobMock.DidNotReceiveWithAnyArgs().AddJobAsync(default!);
 
     }
 
@@ -55,13 +56,12 @@ public class DeleteUserHandlerUnitario
         DeleteUserCommand deleteUserCommand = new(Guid.NewGuid().ToString());
         _dbMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<Domain.Entity.User>(null));
 
-        var hanlder = await DeleteHandler().HandleAsync(deleteUserCommand);
+        var hanlder = await DeleteHandler(deleteUserCommand);
 
         hanlder.IsSuccess.Should().BeFalse();
         hanlder.Errors!.Should().Contain(Error.NotFound);
 
         await _dbMock.DidNotReceive().SaveChangesAsync();
-        await _jobMock.DidNotReceiveWithAnyArgs().AddJobAsync(default!);
 
     }
 
@@ -89,13 +89,12 @@ public class DeleteUserHandlerUnitario
 
         _dbMock.SaveChangesAsync().Returns(Task.FromResult(1));
 
-        var hanlder = await DeleteHandler().HandleAsync(deleteUserCommand);
+        var hanlder = await DeleteHandler(deleteUserCommand);
 
         hanlder.IsSuccess.Should().BeTrue();
         hanlder.Value.Should().BeTrue();
 
         await _dbMock.Received().SaveChangesAsync();
-        await _jobMock.Received().AddJobAsync(Arg.Any<SyncData<Domain.Entity.User>>());
 
     }
 
