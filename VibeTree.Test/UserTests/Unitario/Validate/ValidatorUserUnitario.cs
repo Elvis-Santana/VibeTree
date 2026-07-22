@@ -2,7 +2,9 @@
 using FluentAssertions;
 using VibeTree.Application.User.Create.Commands;
 using VibeTree.Application.User.Delete;
+using VibeTree.Application.User.Delete.Commands;
 using VibeTree.Application.User.Update;
+using VibeTree.Application.User.Update.Commands;
 
 namespace VibeTree.Test.UserTests.Unitario.Validate;
 

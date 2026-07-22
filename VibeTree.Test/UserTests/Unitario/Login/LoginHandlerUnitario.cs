@@ -34,7 +34,7 @@ public class LoginHandlerUnitario
         string pwdhash = BCryptNet.HashPassword(pwd);
 
 
-        var user = new Faker<Domain.Entity.User>("pt_BR")
+        var user = new Faker<User>("pt_BR")
             .CustomInstantiator(u => new(
                 Guid.NewGuid(),
                 DateTime.Now,
@@ -62,8 +62,8 @@ public class LoginHandlerUnitario
         _validatorMock.ValidateAsync(Arg.Any<LoginQuery>())
             .Returns(new ValidationResult());
 
-        var listaUsuarios = new List<Domain.Entity.User> { user };
-        var listaPerfils = new List<Domain.Entity.Perfil> { perfil };
+        var listaUsuarios = new List<User> { user };
+        var listaPerfils = new List<Perfil> { perfil };
 
         var usersSetMock = listaUsuarios.BuildMockDbSet();
         var perfilsSetMock = listaPerfils.BuildMockDbSet();
@@ -72,14 +72,14 @@ public class LoginHandlerUnitario
         _readDbContextMock.perfils.Returns(perfilsSetMock);
 
 
-        _tokenServiceMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>())
+        _tokenServiceMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token(token)));
 
         var handler =
             new LoginHandler(_readDbContextMock, _tokenServiceMock, _validatorMock);
 
 
-        var result = await handler.HandleAsync(query);
+        var result = await handler.Handle(query);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Name.Should().Be(user.Name);
@@ -87,7 +87,7 @@ public class LoginHandlerUnitario
         result.Value.Email.Should().Be(user.Email);
 
         await _tokenServiceMock.Received()
-            .CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>());
+            .CriarToken(Arg.Any<User>(), Arg.Any<Perfil>());
 
     }
     [Fact]
@@ -110,7 +110,7 @@ public class LoginHandlerUnitario
 
         LoginQuery query = new(string.Empty,string.Empty);
 
-        var result = await handler.HandleAsync(query);
+        var result = await handler.Handle(query);
 
 
         result.IsSuccess.Should().BeFalse();
