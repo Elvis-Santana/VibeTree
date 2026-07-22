@@ -9,15 +9,17 @@ using Microsoft.EntityFrameworkCore.Storage;
 using MockQueryable;
 using MockQueryable.NSubstitute;
 using NSubstitute;
+using System;
 using System.Linq.Expressions;
 using VibeTree.Application.Auth;
+using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Result;
 using VibeTree.Application.Sync;
 using VibeTree.Application.User;
+using VibeTree.Application.User.Create.Commands;
 using VibeTree.Test.EntityTest;
-using VibeTree.User.CreateUser;
+using Wolverine;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Create;
@@ -28,13 +30,11 @@ public class CreateUserHandlerUnitario
 
     private readonly ITokenService _tokenMock =  Substitute.For<ITokenService>();
 
-    private readonly IQueueSynchronizeDb<SyncData<Domain.Entity.User>> _jobMockUser = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.User>>>();
-    private readonly IQueueSynchronizeDb<SyncData<Domain.Entity.Perfil>> _jobMockPerfil = Substitute.For<IQueueSynchronizeDb<SyncData<Domain.Entity.Perfil>>>();
+    private readonly IMessageBus _messageContextMock = Substitute.For<IMessageBus>();
 
     private readonly IValidator<CreateUserAndProfileCommand> _validatorMock =Substitute.For<IValidator<CreateUserAndProfileCommand>>();
 
 
-    public CreateUserAndProfileHandler createUser()=> new CreateUserAndProfileHandler(_dbMock, _tokenMock, _validatorMock, _jobMockUser, _jobMockPerfil);
 
     [Fact]
     public async Task Handle_DeveRetonarFalhaQuandoCommandInvalido()
@@ -50,17 +50,15 @@ public class CreateUserHandlerUnitario
         _validatorMock
             .ValidateAsync(Arg.Any<CreateUserAndProfileCommand>())
             .Returns(erros);
-        
-        var createUserCommand = new CreateUserAndProfileCommand("", "", "","");
-        var result = await createUser().HandleAsync(createUserCommand);
+
+        var createUserCommand = new CreateUserAndProfileCommand("", "", "", "");
+        var result = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock, _messageContextMock);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(erros.Errors.Count());
 
         await _dbMock.DidNotReceive().SaveChangesAsync();
         await _tokenMock.DidNotReceiveWithAnyArgs().CriarToken(default!, default!);
-        await _jobMockUser.DidNotReceiveWithAnyArgs().AddJobAsync(default!);
-        await _jobMockPerfil.DidNotReceiveWithAnyArgs().AddJobAsync(default!);
     }
 
     [Fact]
@@ -82,7 +80,7 @@ public class CreateUserHandlerUnitario
 
         var usuarioExistente = new Domain.Entity.User(
             Guid.NewGuid(), DateTime.UtcNow, DateTime.UtcNow,
-            faker.Internet.UserName(), 
+            faker.Internet.UserName(),
             faker.Internet.Password(),
             createUserCommand.Email);
 
@@ -91,7 +89,7 @@ public class CreateUserHandlerUnitario
 
         _dbMock.Users.Returns(usersSetMock);
 
-        var result = await createUser().HandleAsync(createUserCommand);
+        var result = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock,_messageContextMock); ;
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
@@ -103,18 +101,18 @@ public class CreateUserHandlerUnitario
     public async Task Handle_DeveCriarUsuarioComSucesso()
     {
 
-        await using  var name = new DbContextBuildConfig();
+        await using var name = new DbContextBuildConfig();
         var context = await name.CriarContextoWritePreparadoAsync();
 
         // Arrange
-        var faker = new Faker("pt_BR");
+        var createUserCommand = new Faker<CreateUserAndProfileCommand>("pt_BR")
+            .CustomInstantiator(f => new CreateUserAndProfileCommand(
+            f.Person.FullName,
+            f.Internet.Password(),
+            f.Internet.Email(),
+            f.Internet.UserName()
+        )).Generate();
 
-        var createUserCommand = new CreateUserAndProfileCommand(
-            faker.Person.FullName,
-            faker.Internet.Password(),
-            faker.Internet.Email(),
-            faker.Internet.UserName() 
-        );
 
         string expectedToken = "token";
 
@@ -130,17 +128,15 @@ public class CreateUserHandlerUnitario
         var perfilsSetMock = listaPerfils.BuildMockDbSet();
         _dbMock.perfils.Returns(perfilsSetMock);
 
-       
+
 
         _tokenMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>())
             .Returns(Task.FromResult(new Token(expectedToken)));
 
-        _jobMockUser.AddJobAsync(Arg.Any<SyncData<Domain.Entity.User>>()).Returns(ValueTask.CompletedTask);
-        _jobMockPerfil.AddJobAsync(Arg.Any<SyncData<Domain.Entity.Perfil>>()).Returns(ValueTask.CompletedTask);
+
 
         // Act
-        var h = new CreateUserAndProfileHandler(context, _tokenMock, _validatorMock, _jobMockUser, _jobMockPerfil); ;
-        var result = await h.HandleAsync(createUserCommand);
+        var result = await   CreateUserAndProfileHandler.Handle(createUserCommand, context, _tokenMock, _validatorMock, _messageContextMock); 
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -149,21 +145,10 @@ public class CreateUserHandlerUnitario
         result.Value.Token.Should().Be(expectedToken);
         result.Value.Id.Should().NotBe(Guid.Empty);
 
-
-        await _jobMockUser
-            .Received()
-            .AddJobAsync(Arg.Any<SyncData<Domain.Entity.User>>());
-
-        await _jobMockPerfil
-          .Received()
-          .AddJobAsync(Arg.Any<SyncData<Domain.Entity.Perfil>>());
-
-
+   
         await _tokenMock
             .Received()
             .CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>());
-
-
     }
 
 
