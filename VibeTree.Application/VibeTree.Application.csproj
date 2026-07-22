@@ -13,7 +13,14 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
-  </ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.15" />
+    <PackageReference Include="WolverineFx" Version="6.21.0" />
+    <PackageReference Include="WolverineFx.MySql" Version="6.21.0" />
+	 <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.21.0" Condition="'$(Configuration)' == 'Debug'" />
+</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Internal\Generated\**\*.cs" Watch="false" />
+	</ItemGroup>
 
 </Project>
