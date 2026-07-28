@@ -1,6 +1,6 @@
 ﻿using VibeTree.Shared.DbAppContext;
 
-namespace VibeTree.Features.User.Update.Events;
+namespace VibeTree.Features.User.UpdateUser.Events;
 
 public static class SyncUserUpdateHandler
 {

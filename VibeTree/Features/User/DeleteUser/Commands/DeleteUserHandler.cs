@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using VibeTree.Features.User.Delete.Events;
+using VibeTree.Features.User.DeleteUser.Events;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 
-namespace VibeTree.Features.User.Delete.Commands;
+namespace VibeTree.Features.User.DeleteUser.Commands;
 
 public static class DeleteUserHandler
 {
@@ -28,13 +28,9 @@ public static class DeleteUserHandler
             return (Error.UserNotFound,null);
 
        
-            writeDbContext.Users.Remove(user);
-            await writeDbContext.SaveChangesAsync();
+        writeDbContext.Users.Remove(user);
+        await writeDbContext.SaveChangesAsync();
         var @event = new SyncUserDeleteEvent(user);
-            return (true, @event);
-
-        
-        
-
+        return (true, @event);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Bogus;
 using FluentAssertions;
 using VibeTree.Features.User.CreateUser.Commands;
-using VibeTree.Features.User.Delete.Commands;
-using VibeTree.Features.User.Update.Commands;
+using VibeTree.Features.User.DeleteUser.Commands;
+using VibeTree.Features.User.UpdateUser.Commands;
 
 namespace VibeTree.Test.UserTests.Unitario.Validate;
 

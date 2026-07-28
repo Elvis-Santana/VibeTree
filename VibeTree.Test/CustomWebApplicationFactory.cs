@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VibeTree.Features.User.CreateUser.Commands;
-using VibeTree.Features.User.Delete.Commands;
-using VibeTree.Features.User.Update.Commands;
+using VibeTree.Features.User.DeleteUser.Commands;
+using VibeTree.Features.User.UpdateUser.Commands;
 using VibeTree.Shared.DbAppContext;
 using Wolverine;
 

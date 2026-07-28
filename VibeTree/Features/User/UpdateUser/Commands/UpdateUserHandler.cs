@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using VibeTree.Features.User.Update.Events;
+using VibeTree.Features.User.UpdateUser.Events;
 using VibeTree.Shared.Auth;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace VibeTree.Features.User.Update.Commands;
+namespace VibeTree.Features.User.UpdateUser.Commands;
 
 public class UpdateUserHandler (
         WriteDbContext writeDbContext,
@@ -22,7 +22,12 @@ public class UpdateUserHandler (
         if (!validationResult.IsValid)
             return (validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList(),null);
 
-        Shared.Entity.User? user = await writeDbContext.Users.Include(a =>a.Perfil).FirstOrDefaultAsync(a => a.Id.Equals(Guid.Parse(command.Id)));
+        if (!Guid.TryParse(command.Id, out Guid idGuid))
+            return (Error.IdValid,null);
+
+        Shared.Entity.User? user = await writeDbContext.Users
+            .Include(a =>a.Perfil)
+            .FirstOrDefaultAsync(a => a.Id == idGuid);
        
         if (user is null)
             return (Error.NotFound,null);

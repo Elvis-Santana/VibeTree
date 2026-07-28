@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VibeTree.Features.User.Update.Events;
+namespace VibeTree.Features.User.DeleteUser.Events;
 
-public record SyncUserUpdateEvent(Shared.Entity.User User);
+public record SyncUserDeleteEvent(Shared.Entity.User User);
 
 

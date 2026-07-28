@@ -3,7 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using MockQueryable.NSubstitute;
 using NSubstitute;
-using VibeTree.Features.User.Update.Commands;
+using VibeTree.Features.User.UpdateUser.Commands;
 using VibeTree.Shared.Auth;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;

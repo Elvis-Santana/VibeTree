@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using VibeTree.Shared.Common;
 
-namespace VibeTree.Features.User.Update.Commands;
+namespace VibeTree.Features.User.UpdateUser.Commands;
 
 public class UpdateUserValidator: AbstractValidator<UpdateUserCommand>
 {

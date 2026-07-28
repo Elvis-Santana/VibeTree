@@ -1,7 +1,7 @@
 ﻿using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 
-namespace VibeTree.Features.User.Get.ById;
+namespace VibeTree.Features.User.GetUser.GetByIdUser;
 
 public class GetByIdUserHandler (ReadDbContext readDbContext)
 {

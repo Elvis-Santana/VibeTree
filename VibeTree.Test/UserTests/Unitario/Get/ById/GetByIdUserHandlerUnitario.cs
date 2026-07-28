@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NSubstitute;
 using VibeTree.Features.User;
-using VibeTree.Features.User.Get.ById;
+using VibeTree.Features.User.GetUser.GetByIdUser;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;

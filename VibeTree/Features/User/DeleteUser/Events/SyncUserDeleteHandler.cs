@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Shared.DbAppContext;
 
-namespace VibeTree.Features.User.Delete.Events;
+namespace VibeTree.Features.User.DeleteUser.Events;
 
 public static class SyncUserDeleteHandler
 {

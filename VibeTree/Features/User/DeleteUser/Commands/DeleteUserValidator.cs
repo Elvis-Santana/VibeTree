@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Shared.Common;
 
-namespace VibeTree.Features.User.Delete.Commands;
+namespace VibeTree.Features.User.DeleteUser.Commands;
 
 public class DeleteUserValidator : AbstractValidator<DeleteUserCommand>
 {

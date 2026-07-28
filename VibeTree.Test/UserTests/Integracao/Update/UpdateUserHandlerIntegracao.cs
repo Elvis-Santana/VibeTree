@@ -8,7 +8,7 @@ using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Json;
 using VibeTree.Features.User;
-using VibeTree.Features.User.Update.Commands;
+using VibeTree.Features.User.UpdateUser.Commands;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;

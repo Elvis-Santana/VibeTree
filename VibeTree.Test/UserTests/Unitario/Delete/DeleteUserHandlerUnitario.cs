@@ -3,7 +3,7 @@ using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using NSubstitute;
-using VibeTree.Features.User.Delete.Commands;
+using VibeTree.Features.User.DeleteUser.Commands;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
