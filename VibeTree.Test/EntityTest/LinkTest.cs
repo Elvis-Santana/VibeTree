@@ -1,11 +1,6 @@
 ﻿using Bogus;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Domain.Entity;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.EntityTest;
 

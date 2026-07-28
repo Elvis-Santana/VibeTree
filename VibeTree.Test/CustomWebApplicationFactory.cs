@@ -6,11 +6,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.User.Create.Commands;
-using VibeTree.Application.User.Delete.Commands;
-using VibeTree.Application.User.Update.Commands;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Features.User.CreateUser.Commands;
+using VibeTree.Features.User.Delete.Commands;
+using VibeTree.Features.User.Update.Commands;
+using VibeTree.Shared.DbAppContext;
 using Wolverine;
 
 namespace VibeTree.Test;
@@ -55,9 +54,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
                 d.ServiceType == typeof(DbContextOptions<WriteDbContext>) ||
                 d.ServiceType == typeof(DbContextOptions<ReadDbContext>) ||
                 d.ServiceType == typeof(WriteDbContext) ||
-                d.ServiceType == typeof(ReadDbContext) ||
-                d.ServiceType == typeof(IWriteDbContext) ||
-                d.ServiceType == typeof(IReadDbContext))
+                d.ServiceType == typeof(ReadDbContext))
+        
 
             ).ToList();
 
@@ -73,10 +71,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
             _readConnection.Open();
 
             services.AddDbContext<WriteDbContext>(options => options.UseSqlite(_writeConnection));
-            services.AddScoped<IWriteDbContext, WriteDbContext>();
 
             services.AddDbContext<ReadDbContext>(options => options.UseSqlite(_readConnection));
-            services.AddScoped<IReadDbContext, ReadDbContext>();
 
 
             services.Configure<WolverineOptions>(opts =>

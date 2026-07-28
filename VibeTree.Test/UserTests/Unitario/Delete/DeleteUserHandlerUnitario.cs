@@ -3,17 +3,17 @@ using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using NSubstitute;
-using VibeTree.Application.Common;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.User.Delete.Commands;
-using VibeTree.Entity;
+using VibeTree.Features.User.Delete.Commands;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Delete;
 
 public class DeleteUserHandlerUnitario
 {
-    private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
+    private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
     private readonly IValidator<DeleteUserCommand> _validatorMock = Substitute.For<IValidator<DeleteUserCommand>>();
 
     public async Task<Result<bool>> DeleteHandler(DeleteUserCommand command)
@@ -70,7 +70,7 @@ public class DeleteUserHandlerUnitario
     {
 
         var user = new Faker<User>("pt_BR")
-             .CustomInstantiator(u => new Domain.Entity.User(
+             .CustomInstantiator(u => new User(
                  Guid.NewGuid(),
                  DateTime.UtcNow,
                  DateTime.UtcNow,

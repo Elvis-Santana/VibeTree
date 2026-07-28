@@ -3,19 +3,18 @@ using FluentValidation;
 using FluentValidation.Results;
 using MockQueryable.NSubstitute;
 using NSubstitute;
-using VibeTree.Application.Auth;
-using VibeTree.Application.Common;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.User.Update.Commands;
-using VibeTree.Entity;
-using Wolverine;
+using VibeTree.Features.User.Update.Commands;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Update;
 
 public class UpdateUserHandlerUnitario
 {
-    private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
+    private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
     private readonly ITokenService _tokenMock = Substitute.For<ITokenService>();
 
     private readonly IValidator<UpdateUserCommand> _validatorMock = Substitute.For<IValidator<UpdateUserCommand>>();
@@ -122,8 +121,8 @@ public class UpdateUserHandlerUnitario
         var initialHash = BCrypt.Net.BCrypt.HashPassword("initial-hash");
         var newPassword = BCrypt.Net.BCrypt.HashPassword("UPDATE-hash");
 
-        var user = new Domain.Entity
-            .User(userId, DateTime.UtcNow, DateTime.UtcNow, "oldName", initialHash, "old@email");
+        var user = new 
+            User(userId, DateTime.UtcNow, DateTime.UtcNow, "oldName", initialHash, "old@email");
 
         var command = new UpdateUserCommand(userId.ToString(), string.Empty, string.Empty, newPassword);
 

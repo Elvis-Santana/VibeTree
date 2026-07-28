@@ -1,17 +1,9 @@
 ﻿using Bogus;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using NSubstitute;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Auth;
-using VibeTree.Entity;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.ServiceTest.TokenServiceTest;
 
@@ -70,7 +62,7 @@ public class TokenServiceTest
 
     private User CriarUsuarioValido()
     {
-        return new Domain.Entity.User(
+        return new User(
             Guid.NewGuid(),
             DateTime.UtcNow,
             DateTime.UtcNow,

@@ -1,10 +1,9 @@
 ﻿using Bogus;
 using FluentAssertions;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Perfil;
-using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.Common;
-using VibeTree.Entity;
+using VibeTree.Features.Perfil;
+using VibeTree.Features.Perfil.Get.GetBySlug;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.PerfilTest.GetSlugTest;
 

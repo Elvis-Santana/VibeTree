@@ -2,36 +2,23 @@
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using MockQueryable;
 using MockQueryable.NSubstitute;
 using NSubstitute;
-using System;
-using System.Linq.Expressions;
-using VibeTree.Application.Auth;
-using VibeTree.Application.Common;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Sync;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Create.Commands;
-using VibeTree.Entity;
-using VibeTree.Test.EntityTest;
-using Wolverine;
+using VibeTree.Features.User.CreateUser.Commands;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Create;
 
 public class CreateUserAndProfileHandlerUnitario
 {
-    private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
+    private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
 
     private readonly ITokenService _tokenMock =  Substitute.For<ITokenService>();
 
-    private readonly IMessageContext _messageContextMock = Substitute.For<IMessageContext>();
 
     private readonly IValidator<CreateUserAndProfileCommand> _validatorMock =Substitute.For<IValidator<CreateUserAndProfileCommand>>();
 
@@ -79,7 +66,7 @@ public class CreateUserAndProfileHandlerUnitario
             .ValidateAsync(Arg.Any<CreateUserAndProfileCommand>())
             .Returns(new ValidationResult());
 
-        var usuarioExistente = new Domain.Entity.User(
+        var usuarioExistente = new User(
             Guid.NewGuid(), DateTime.UtcNow, DateTime.UtcNow,
             faker.Internet.UserName(),
             faker.Internet.Password(),
@@ -102,8 +89,8 @@ public class CreateUserAndProfileHandlerUnitario
     public async Task Handle_DeveCriarUsuarioComSucesso()
     {
 
-        await using var name = new DbContextBuildConfig();
-        var context = await name.CriarContextoWritePreparadoAsync();
+        await using var dbContext = new DbContextBuildConfig();
+        var context = await dbContext.CriarContextoWritePreparadoAsync();
 
         // Arrange
         var createUserCommand = new Faker<CreateUserAndProfileCommand>("pt_BR")
@@ -129,12 +116,8 @@ public class CreateUserAndProfileHandlerUnitario
         var perfilsSetMock = listaPerfils.BuildMockDbSet();
         _dbMock.perfils.Returns(perfilsSetMock);
 
-
-
         _tokenMock.CriarToken(Arg.Any<User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token(expectedToken)));
-
-
 
         // Act
         var (result,_) = await   CreateUserAndProfileHandler.Handle(createUserCommand, context, _tokenMock, _validatorMock); 
@@ -146,7 +129,6 @@ public class CreateUserAndProfileHandlerUnitario
         result.Value.Token.Should().Be(expectedToken);
         result.Value.Id.Should().NotBe(Guid.Empty);
 
-   
         await _tokenMock
             .Received()
             .CriarToken(Arg.Any<User>(), Arg.Any<Perfil>());

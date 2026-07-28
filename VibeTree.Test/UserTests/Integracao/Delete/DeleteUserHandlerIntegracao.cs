@@ -5,11 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Net.Http.Json;
-using VibeTree.Application.Common;
-using VibeTree.Application.User.Delete.Commands;
-using VibeTree.Application.User.Login;
-using VibeTree.Entity;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.UserTests.Integracao.Delete;
 

@@ -4,11 +4,11 @@ using FluentValidation;
 using FluentValidation.Results;
 using MockQueryable.NSubstitute;
 using NSubstitute;
-using VibeTree.Application.Auth;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Login;
-using VibeTree.Entity;
+using VibeTree.Features.User;
+using VibeTree.Features.User.Login;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 using BCryptNet = BCrypt.Net.BCrypt;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -16,8 +16,8 @@ namespace VibeTree.Test.UserTests.Unitario.Login;
 
 public class LoginHandlerUnitario
 {
-    private readonly IReadDbContext _readDbContextMock =
-        Substitute.For<IReadDbContext>();
+    private readonly ReadDbContext _readDbContextMock =
+        Substitute.For<ReadDbContext>();
 
     private readonly ITokenService _tokenServiceMock =
         Substitute.For<ITokenService>();

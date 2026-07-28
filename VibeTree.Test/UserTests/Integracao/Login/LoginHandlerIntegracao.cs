@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Json;
-using VibeTree.Application.Common;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Login;
-using VibeTree.Entity;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Features.User;
+using VibeTree.Features.User.Login;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.UserTests.Integracao.Login;
 

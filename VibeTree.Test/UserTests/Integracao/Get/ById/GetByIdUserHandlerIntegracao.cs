@@ -6,11 +6,11 @@ using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using VibeTree.Application.Auth;
-using VibeTree.Application.Common;
-using VibeTree.Application.User;
-using VibeTree.Entity;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Features.User;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.UserTests.Integracao.Get.ById;
 

@@ -1,23 +1,17 @@
 ﻿using Bogus;
 using FluentAssertions;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Common;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Get.ById;
-using VibeTree.Entity;
+using VibeTree.Features.User;
+using VibeTree.Features.User.Get.ById;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.UserTests.Unitario.Get.ById;
 
 public class GetByIdUserHandlerUnitario
 {
-    private IReadDbContext readDbContextMock = Substitute.For<IReadDbContext>();
+    private ReadDbContext readDbContextMock = Substitute.For<ReadDbContext>();
 
     [Fact]
     public async Task Shoud_Retornar_Error_Nao_Encontrado()
@@ -28,7 +22,7 @@ public class GetByIdUserHandlerUnitario
         GetByIdUserHandler handler = new (readDbContextMock);
 
 
-        Result<UserResponse> result =   await handler.HandleAsync(getByIdUserQuery);
+        Result<UserResponse> result =   await handler.Handle(getByIdUserQuery);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.First().Should().Be(Error.UserNotFound);
@@ -57,7 +51,7 @@ public class GetByIdUserHandlerUnitario
         GetByIdUserHandler handler = new(readDbContextMock);
 
 
-        Result<UserResponse> result = await handler.HandleAsync(getByIdUserQuery);
+        Result<UserResponse> result = await handler.Handle(getByIdUserQuery);
 
         result.IsSuccess.Should().BeTrue();
 
@@ -77,7 +71,7 @@ public class GetByIdUserHandlerUnitario
         GetByIdUserHandler handler = new(readDbContextMock);
 
 
-        Result<UserResponse> result = await handler.HandleAsync(getByIdUserQuery);
+        Result<UserResponse> result = await handler.Handle(getByIdUserQuery);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.First().Should().Be(Error.IdValid);

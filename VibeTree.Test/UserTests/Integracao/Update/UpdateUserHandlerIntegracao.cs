@@ -7,11 +7,11 @@ using Microsoft.Extensions.Hosting;
 using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Json;
-using VibeTree.Application.Common;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Update.Commands;
-using VibeTree.Entity;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Features.User;
+using VibeTree.Features.User.Update.Commands;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
+using VibeTree.Shared.Entity;
 
 namespace VibeTree.Test.UserTests.Integracao.Update;
 
