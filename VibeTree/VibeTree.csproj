@@ -8,22 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.13" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.15">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MySql.Data" Version="9.7.0" />
-  </ItemGroup>
+	  <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.13" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\VibeTree.Application\VibeTree.Application.csproj" />
-    <ProjectReference Include="..\VibeTree.Infrastructure\VibeTree.Infrastructure.csproj" />
-	  
+	  <PackageReference Include="MySql.Data" Version="9.7.0" />
+	  <PackageReference Include="FluentValidation" Version="12.1.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.15" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.15" />
+	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+	  <PackageReference Include="WolverineFx" Version="6.21.0" />
+	  <PackageReference Include="WolverineFx.MySql" Version="6.21.0" />
+	  <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.21.0" Condition="'$(Configuration)' == 'Debug'" />
+
   </ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="VibeTree.Test" />
+		<Compile Update="Internal\Generated\**\*.cs" Watch="false" />
 	</ItemGroup>
+	
+    <ItemGroup>
+	    <InternalsVisibleTo Include="VibeTree.Test" />
+    </ItemGroup>
 
 </Project>
