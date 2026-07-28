@@ -9,20 +9,18 @@ using System.Security.Claims;
 using VibeTree.Application.Common;
 using VibeTree.Application.ConfigureApplication;
 using VibeTree.Application.Interfaces;
-using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.Sync;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Create.Commands;
 using VibeTree.Application.User.Delete.Commands;
 using VibeTree.Application.User.Get.ById;
 using VibeTree.Application.User.Login;
 using VibeTree.Application.User.Update.Commands;
-using VibeTree.Domain.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,12 +90,19 @@ builder.Services.ConfigureServicesApplication(builder.Configuration);
 
 builder.Host.UseWolverine(opts =>
 {
+    opts.Policies.UseDurableLocalQueues();
+    opts.Services.AddDbContextWithWolverineIntegration<WriteDbContext>(options =>
+        options.UseMySql(connectionWrite, ServerVersion.AutoDetect(connectionWrite)));
+
     opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
     opts.Discovery.IncludeAssembly(typeof(DeleteUserCommand).Assembly);
     opts.Discovery.IncludeAssembly(typeof(UpdateUserCommand).Assembly);
 
     opts.CodeGeneration.AlwaysUseServiceLocationFor<IWriteDbContext>();
     opts.CodeGeneration.AlwaysUseServiceLocationFor<IReadDbContext>();
+
+
+    opts.Policies.ConfigureConventionalLocalRouting();
 
     if (builder.Environment.IsDevelopment())
     {

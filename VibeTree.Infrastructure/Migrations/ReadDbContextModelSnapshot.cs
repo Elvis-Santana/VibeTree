@@ -65,6 +65,7 @@ namespace VibeTree.Infrastructure.Migrations
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
+                        .IsUnicode(true)
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -74,6 +75,8 @@ namespace VibeTree.Infrastructure.Migrations
 
                     b.HasIndex("IdUser")
                         .IsUnique();
+
+                    b.HasIndex("Slug");
 
                     b.ToTable("perfils");
                 });
@@ -89,7 +92,7 @@ namespace VibeTree.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .IsUnicode(true)
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -104,6 +107,8 @@ namespace VibeTree.Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email");
 
                     b.ToTable("Users");
                 });

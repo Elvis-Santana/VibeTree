@@ -1,20 +1,34 @@
 ﻿using Bogus;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Create.Commands;
 using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Infrastructure.Extensions;
+using Wolverine;
+using Wolverine.Tracking;
+using Xunit.Abstractions;
 namespace VibeTree.Test.UserTests.Integracao.Create;
 
 [Collection(IntegrationCollection.Name)]
-public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
+    private readonly ITestOutputHelper _testOutputHelper = _output;
+
+    private IHost Host => _factory.WolverineHost!;
 
     public Task InitializeAsync() => ResetDatabaseAsync();
 
@@ -49,9 +63,18 @@ public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory f
     {
         var faker = new Faker("pt_BR");
         var plainPassword = faker.Internet.Password();
-        var command = new CreateUserAndProfileCommand(faker.Person.FullName, plainPassword, faker.Person.Email, faker.Person.FullName);
 
-        var response = await _client.PostAsJsonAsync("/user", command);
+        CreateUserAndProfileCommand command = new (
+            faker.Person.FullName, 
+            plainPassword, 
+            faker.Person.Email,
+            faker.Person.FullName
+        );
+
+        HttpResponseMessage response =await Utils.Cast(
+            this.Host,
+            Task.Run(async () => await _client.PostAsJsonAsync("/user", command))
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -67,26 +90,33 @@ public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory f
         {
             using var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
 
-                var savedUserRead = await readDb.Users
-                .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
+           
+            var savedUserRead = await readDb.Users.Include(a=>a.Perfil)
+            .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
+            _testOutputHelper.WriteLine(savedUserRead.ToJson());
 
-                savedUserRead.Should().NotBeNull();
-                savedUserRead!.Name.Should().Be(command.Name);
-                BCrypt.Net.BCrypt.Verify(plainPassword, savedUserRead.PasswordHash).Should().BeTrue();
+
+            savedUserRead.Should().NotBeNull();
+            savedUserRead!.Name.Should().Be(command.Name);
+            BCrypt.Net.BCrypt.Verify(plainPassword, savedUserRead.PasswordHash).Should().BeTrue();
+            savedUserRead.Perfil.IdUser.Should().Be(result.Value.Id);
 
             using var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-                var savedUserWrite = await writeDb.Users
-                .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
+            var savedUserWrite = await writeDb.Users.Include(a => a.Perfil)
+            .FirstOrDefaultAsync(u => u.Id == result.Value.Id);
 
-                savedUserWrite.Should().NotBeNull();
-                savedUserWrite!.Name.Should().Be(command.Name);
-                BCrypt.Net.BCrypt.Verify(plainPassword, savedUserWrite.PasswordHash).Should().BeTrue();
-            
+            savedUserWrite.Should().NotBeNull();
+            savedUserWrite!.Name.Should().Be(command.Name);
+            BCrypt.Net.BCrypt.Verify(plainPassword, savedUserWrite.PasswordHash).Should().BeTrue();
+            savedUserWrite.Perfil.IdUser.Should().Be(result.Value.Id);
+
+
+
         }
-       
 
     }
 
+ 
     [Fact]
     public async Task Deve_Retornar_BadRequest_Por_Informacores_Invalidas()
     {

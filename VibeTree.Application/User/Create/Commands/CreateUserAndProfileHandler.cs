@@ -4,45 +4,44 @@ using VibeTree.Application.Auth;
 using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User.Create.Events;
-using Wolverine;
-using Wolverine.Attributes;
 
 namespace VibeTree.Application.User.Create.Commands;
 
 public static class CreateUserAndProfileHandler {
 
-    public static async Task<Result<Userlogin>> Handle( 
-        CreateUserAndProfileCommand command, 
+    public static async Task<(Result<Userlogin> , SyncUserPerfilCreatedEvent?)> Handle(
+        CreateUserAndProfileCommand command,
         IWriteDbContext writeDbContext,
         ITokenService tokenService,
-        IValidator<CreateUserAndProfileCommand> validator,
-        IMessageBus bus
+        IValidator<CreateUserAndProfileCommand> validator
     )
     {
         var validationResult = await validator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
             var err = validationResult.Errors.Select(e => new Error(e.ErrorMessage)).ToList();
-            return err;
+            return (err,null);
         }
+
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(command.Password);
 
         bool existe = await writeDbContext
             .Users
-            .AnyAsync(u=> u.Email.ToLower().Trim().Equals(command.Email.ToLower().Trim()));
+            .AsNoTracking()
+            .AnyAsync(u=> u.Email==command.Email);
 
         if (existe)
-            return Error.ExisteUser;
+            return (Error.ExisteUser,null);
 
             Domain.Entity.User user = new(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
-                DateTime.UtcNow,
-                command.Name,
-                BCrypt.Net.BCrypt.HashPassword(command.Password),
-                command.Email
+                     Guid.NewGuid(),
+                     DateTime.UtcNow,
+                     DateTime.UtcNow,
+                     command.Name,
+                      passwordHash,
+                     command.Email
             );
 
-            await writeDbContext.Users.AddAsync(user);
 
             Domain.Entity.Perfil perfil = new(
                     Guid.NewGuid(),
@@ -55,15 +54,16 @@ public static class CreateUserAndProfileHandler {
                     user.Id
             );
 
+            await writeDbContext.Users.AddAsync(user);
             await writeDbContext.perfils.AddAsync(perfil);
 
-            await  writeDbContext.SaveChangesAsync();
+            await writeDbContext.SaveChangesAsync();
 
-            await bus.PublishAsync(new SyncUserPerfilCreatedEvent(user, perfil));
+            var token = await tokenService.CriarToken(user, perfil);
+            var @event = new SyncUserPerfilCreatedEvent(user, perfil);
+            return (new Userlogin(user.Id, user.Name, user.Email, token.token), @event);
 
-            Token token = await tokenService.CriarToken(user, perfil);
-
-            return new Userlogin(user.Id, user.Name, user.Email, token.token);
+       
     }
 
 }

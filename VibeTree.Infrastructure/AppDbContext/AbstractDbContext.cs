@@ -33,9 +33,13 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
         modelBuilder.Entity<UserEntity>(u =>
         {
             u.HasKey(x => x.Id);
+
+            u.HasIndex(a => a.Email);
+
             u.Property(x => x.Name);
             u.Property(x => x.PasswordHash).HasMaxLength(255);
-            u.Property(x => x.Email).IsUnicode();
+            u.Property(x => x.Email)
+                .IsUnicode();
             u.Property(x => x.CreatedAt);
             u.Property(x => x.UpdatedAt);
 
@@ -61,9 +65,13 @@ public abstract class AbstractDbContext(DbContextOptions dbContextOptions) : DbC
             p.HasKey(x => x.Id);
 
             p.Property(x => x.Id)
-            .ValueGeneratedNever();
-            p.Property(x => x.Descricao).HasMaxLength(255);
-            p.Property(x => x.Slug).HasMaxLength(255);
+                .ValueGeneratedNever();
+            p.Property(x => x.Descricao)
+                .HasMaxLength(255);
+            p.HasIndex(x => x.Slug);
+            p.Property(x => x.Slug)
+                .HasMaxLength(255)
+                .IsUnicode();
             p.Property(x => x.ImagemUrl);
             p.Property(x => x.Cor);
             p.Property(x => x.CreatedAt);

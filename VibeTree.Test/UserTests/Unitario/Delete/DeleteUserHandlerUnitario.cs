@@ -3,25 +3,24 @@ using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using NSubstitute;
-using System.Threading.Tasks;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Interfaces.IQueryJob;
-using VibeTree.Application.Sync;
 using VibeTree.Application.Common;
-using ValidationResult = FluentValidation.Results.ValidationResult;
+using VibeTree.Application.Interfaces;
 using VibeTree.Application.User.Delete.Commands;
-using Wolverine;
-using Spectre.Console.Rendering;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Delete;
 
 public class DeleteUserHandlerUnitario
 {
     private readonly IWriteDbContext _dbMock = Substitute.For<IWriteDbContext>();
-    private readonly IMessageBus _busMock = Substitute.For<IMessageBus>();
     private readonly IValidator<DeleteUserCommand> _validatorMock = Substitute.For<IValidator<DeleteUserCommand>>();
 
-    public Task<Result<bool>> DeleteHandler(DeleteUserCommand command) => DeleteUserHandler.Handle(command,_dbMock, _validatorMock, _busMock);
+    public async Task<Result<bool>> DeleteHandler(DeleteUserCommand command)
+    {
+      var (result,_) =await  DeleteUserHandler.Handle(command, _dbMock, _validatorMock);
+        return result;
+    }
+        
 
     [Fact]
     public async Task Handler_Deve_Retornar_Id_Vazio()
@@ -59,7 +58,7 @@ public class DeleteUserHandlerUnitario
         var hanlder = await DeleteHandler(deleteUserCommand);
 
         hanlder.IsSuccess.Should().BeFalse();
-        hanlder.Errors!.Should().Contain(Error.NotFound);
+        hanlder.Errors!.Should().Contain(Error.UserNotFound);
 
         await _dbMock.DidNotReceive().SaveChangesAsync();
 

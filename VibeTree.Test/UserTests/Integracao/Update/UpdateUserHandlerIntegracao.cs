@@ -3,6 +3,8 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using MySqlX.XDevAPI;
 using System.Net;
 using System.Net.Http.Json;
 using VibeTree.Application.Common;
@@ -18,6 +20,7 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
 {
     private readonly HttpClient client = factory.CreateClient();
     private readonly CustomWebApplicationFactory _factory = factory;
+    private IHost Host => _factory.WolverineHost!;
 
     public async Task InitializeAsync()=> await this.ResetDatabaseAsync();
     public Task DisposeAsync() => Task.CompletedTask;
@@ -50,7 +53,10 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
             )
         ).Generate();
 
-        var response = await client.PatchAsJsonAsync<UpdateUserCommand>("/user", user);
+        HttpResponseMessage response = await Utils.Cast(
+            this.Host, 
+            Task.Run(async () =>await client.PatchAsJsonAsync<UpdateUserCommand>("/user", user))
+        );
 
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -59,9 +65,12 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
 
         result.IsSuccess.Should().BeFalse();
 
-        using var scope = _factory.Services.CreateScope();
-        using var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
-        (await readDb.Users.FindAsync(Guid.Parse(user.Id))).Should().BeNull();
+
+      
+            using var scope = _factory.Services.CreateScope();
+            using var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+            (await readDb.Users.FindAsync(Guid.Parse(user.Id))).Should().BeNull();
+    
     }
 
     [Fact]
@@ -100,7 +109,10 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
         ).Generate();
 
 
-        var response = await client.PatchAsJsonAsync<UpdateUserCommand>("/user", updateUser);
+        HttpResponseMessage response = await Utils.Cast(
+                 this.Host,
+                 Task.Run(async () => await client.PatchAsJsonAsync<UpdateUserCommand>("/user", updateUser))
+             );
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -111,6 +123,7 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
         result.Value.Email.Should().Be(updateUser.Email);
         result.Value.Token.Should().BeNullOrWhiteSpace();
 
+       
         using (var scope = _factory.Services.CreateScope())
         {
             var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
@@ -119,7 +132,7 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
             u.Email.Should().Be(updateUser.Email);
             u.Name.Should().Be(updateUser.Name);
         }
-
+       
     }
 
     [Fact]
@@ -137,16 +150,16 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
             )
         ).Generate();
 
-         Perfil perfil = new(
-              Guid.NewGuid(),
-              DateTime.UtcNow,
-              DateTime.UtcNow,
-              string.Empty,
-              string.Empty,
-              string.Empty,
-              user.Name,
-              user.Id
-          );
+        Perfil perfil = new(
+             Guid.NewGuid(),
+             DateTime.UtcNow,
+             DateTime.UtcNow,
+             string.Empty,
+             string.Empty,
+             string.Empty,
+             user.Name,
+             user.Id
+         );
 
         using (var scope = _factory.Services.CreateScope())
         {
@@ -174,28 +187,33 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
 
 
 
-        var response = await client.PatchAsJsonAsync<UpdateUserCommand>("/user", updateUser);
+
+        HttpResponseMessage response = await Utils.Cast(
+                 this.Host,
+                 Task.Run(async () => await client.PatchAsJsonAsync<UpdateUserCommand>("/user", updateUser))
+        );
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.IsSuccessStatusCode.Should().BeTrue();
-
-
         var result = await response.Content.ReadFromJsonAsync<Result<Userlogin>>();
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Name.Should().Be(updateUser.Name);
         result.Value.Email.Should().Be(updateUser.Email);
 
-        using (var scope = _factory.Services.CreateScope())
+
+        using (var scope = _factory.Services.CreateAsyncScope())
         {
             var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
             var u = await readDb.Users
                     .AsNoTracking()
                     .FirstOrDefaultAsync(user => user.Id == id);
             u.Should().NotBeNull();
-           u.Email.Should().Be(updateUser.Email);
+            u.Email.Should().Be(updateUser.Email);
             u.Name.Should().Be(updateUser.Name);
-            BCrypt.Net.BCrypt.Verify(updateUser.Password,u.PasswordHash).Should().BeTrue();
+            BCrypt.Net.BCrypt.Verify(updateUser.Password, u.PasswordHash).Should().BeTrue();
         }
+      
     }
 
 

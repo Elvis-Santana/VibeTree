@@ -30,7 +30,7 @@ public class CreateUserAndProfileHandlerUnitario
 
     private readonly ITokenService _tokenMock =  Substitute.For<ITokenService>();
 
-    private readonly IMessageBus _messageContextMock = Substitute.For<IMessageBus>();
+    private readonly IMessageContext _messageContextMock = Substitute.For<IMessageContext>();
 
     private readonly IValidator<CreateUserAndProfileCommand> _validatorMock =Substitute.For<IValidator<CreateUserAndProfileCommand>>();
 
@@ -52,7 +52,7 @@ public class CreateUserAndProfileHandlerUnitario
             .Returns(erros);
 
         var createUserCommand = new CreateUserAndProfileCommand("", "", "", "");
-        var result = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock, _messageContextMock);
+        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(erros.Errors.Count());
@@ -89,7 +89,7 @@ public class CreateUserAndProfileHandlerUnitario
 
         _dbMock.Users.Returns(usersSetMock);
 
-        var result = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock,_messageContextMock); ;
+        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock); ;
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
@@ -136,7 +136,7 @@ public class CreateUserAndProfileHandlerUnitario
 
 
         // Act
-        var result = await   CreateUserAndProfileHandler.Handle(createUserCommand, context, _tokenMock, _validatorMock, _messageContextMock); 
+        var (result,_) = await   CreateUserAndProfileHandler.Handle(createUserCommand, context, _tokenMock, _validatorMock); 
 
         // Assert
         result.IsSuccess.Should().BeTrue();

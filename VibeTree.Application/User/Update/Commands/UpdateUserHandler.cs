@@ -21,22 +21,21 @@ namespace VibeTree.Application.User.Update.Commands;
 public class UpdateUserHandler (
         IWriteDbContext writeDbContext,
         ITokenService tokenService,
-        IValidator<UpdateUserCommand> validator,
-        IMessageBus bus
+        IValidator<UpdateUserCommand> validator
     ) 
 {
 
-    public async Task<Result<Userlogin>> Handle(UpdateUserCommand command)
+    public async Task<(Result<Userlogin>, SyncUserUpdateEvent?)> Handle(UpdateUserCommand command)
     {
         ValidationResult validationResult = await validator.ValidateAsync(command);
 
         if (!validationResult.IsValid)
-            return validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList();
+            return (validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList(),null);
 
         Domain.Entity.User? user = await writeDbContext.Users.Include(a =>a.Perfil).FirstOrDefaultAsync(a => a.Id.Equals(Guid.Parse(command.Id)));
        
         if (user is null)
-            return Error.NotFound;
+            return (Error.NotFound,null);
 
         user.SetName(command?.Name);
         user.SetEmail(command?.Email);
@@ -48,7 +47,7 @@ public class UpdateUserHandler (
                 ? (await tokenService.CriarToken(user, user.Perfil)).token 
                 : string.Empty;
 
-        await bus.PublishAsync(new SyncUserUpdateEvent(user));
-        return new Userlogin(user.Id, user.Name, user.Email, tokem);
+        var @event = new SyncUserUpdateEvent(user);
+        return (new Userlogin(user.Id, user.Name, user.Email, tokem),@event);
     }
 }

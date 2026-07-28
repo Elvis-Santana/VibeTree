@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Net.Http.Json;
 using VibeTree.Application.Common;
@@ -18,6 +19,7 @@ public class DeleteUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
+    private IHost Host => factory.WolverineHost!;
 
     public Task InitializeAsync() => ResetDatabaseAsync();
 
@@ -120,7 +122,7 @@ public class DeleteUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
         ).Generate();
 
 
-        using (var scope = factory.Services.CreateScope())
+        await   using (var scope = factory.Services.CreateAsyncScope())
         {
             using WriteDbContext write = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
             await StupEntity(user, perfil, write);
@@ -130,7 +132,8 @@ public class DeleteUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
 
         }
 
-        var response = await _client.DeleteAsync($"/user/{id.ToString()}");
+        HttpResponseMessage response = await Utils.Cast(this.Host, Task.Run(async () => await _client.DeleteAsync($"/user/{id.ToString()}")));
+
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -139,15 +142,16 @@ public class DeleteUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
         content.IsSuccess.Should().BeTrue();
         content.Value.Should().BeTrue();
 
-        using (var scope = factory.Services.CreateScope())
+        await  using (var scope = factory.Services.CreateAsyncScope())
         {
+            
             using WriteDbContext write = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
             await VerifyUserNotFoundInContextAsync(user, write);
 
             using ReadDbContext read = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
 
             await VerifyUserNotFoundInContextAsync(user, read);
-
+           
         }
 
         static async Task VerifyUserNotFoundInContextAsync(User user, AbstractDbContext context)

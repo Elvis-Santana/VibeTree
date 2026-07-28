@@ -30,7 +30,7 @@ public class LoginHandler(
             .FirstOrDefaultAsync(u => u.Email.Equals(query.email));
 
         if (user is null || !(BCryptNet.Verify(query.password, user?.PasswordHash)))
-            return Error.InvalidCredentials;
+            return Error.UserNotFound;
 
 
         Token token = await tokenService.CriarToken(user!, user!.Perfil);

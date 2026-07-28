@@ -20,6 +20,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
 {
     private SqliteConnection? _readConnection;
     private SqliteConnection? _writeConnection;
+    public IHost? WolverineHost { get; private set; }
 
     private readonly string _uniqueId = Guid.NewGuid().ToString();
     public async Task InitializeAsync()
@@ -30,6 +31,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
 
         await writeDb.Database.EnsureCreatedAsync();
         await readDb.Database.EnsureCreatedAsync();
+    }
+
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+        WolverineHost = host;
+        return host;
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -82,6 +91,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<global::Program
 
         });
     }
+
+    
 
 
     async Task IAsyncLifetime.DisposeAsync()

@@ -11,39 +11,34 @@ namespace VibeTree.Application.User.Delete.Commands;
 
 public static class DeleteUserHandler
 {
-    public static async Task<Result<bool>> Handle(
+    public static async Task<(Result<bool>, SyncUserDeleteEvent?)> Handle(
          this DeleteUserCommand command,
          IWriteDbContext writeDbContext,
-         IValidator<DeleteUserCommand> validator,
-         IMessageBus bus
+         IValidator<DeleteUserCommand> validator
     )
     {
        var validationResult = await validator.ValidateAsync( command );
 
         if(!validationResult.IsValid)
-            return validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList();
+            return (validationResult.Errors.Select(a => new Error(a.ErrorMessage)).ToList(),null);
 
         if (!Guid.TryParse(command.Id, out var id))
-            return Error.IdValid;
+            return (Error.IdValid,null);
 
        
         Domain.Entity.User? user =  await writeDbContext.Users.FindAsync(id);
 
         if (user is null)
-            return Error.NotFound;
+            return (Error.UserNotFound,null);
 
-        try
-        {
+       
             writeDbContext.Users.Remove(user);
             await writeDbContext.SaveChangesAsync();
-            await bus.PublishAsync(new SyncUserDeleteEvent(user));
-            return true;
+        var @event = new SyncUserDeleteEvent(user);
+            return (true, @event);
 
-        }
-        catch (DbUpdateException)
-        {
-            return new Error("Não foi possível excluir o usuário devido a restrições no banco de dados.");
-        }
+        
+        
 
     }
 }
