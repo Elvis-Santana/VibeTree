@@ -1,12 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VibeTree.Application.Interfaces;
-using VibeTree.Infrastructure.AppDbContext;
+using VibeTree.Shared.DbAppContext;
 
 namespace VibeTree.Test;
 
@@ -31,15 +25,13 @@ public  class DbContextBuildConfig : IAsyncDisposable
 
     }
 
-    public async Task<IWriteDbContext> CriarContextoWritePreparadoAsync()
+    public async Task<WriteDbContext> CriarContextoWritePreparadoAsync()
     {
         var context = new WriteDbContext(_writeOptions);
-
         await  context.Database.EnsureCreatedAsync();
-
         return context;
     }
-    public async Task<IReadDbContext> CriarContextoReadPreparadoAsync()
+    public async Task<ReadDbContext> CriarContextoReadPreparadoAsync()
     {
         var context = new ReadDbContext(_readOptions);
         await context.Database.EnsureCreatedAsync();
