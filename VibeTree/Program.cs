@@ -1,26 +1,27 @@
+using FluentValidation;
 using JasperFx;
 using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using VibeTree.Application.Common;
-using VibeTree.Application.ConfigureApplication;
-using VibeTree.Application.Interfaces;
-using VibeTree.Application.Perfil;
-using VibeTree.Application.Perfil.Get.GetById;
-using VibeTree.Application.Perfil.Get.GetBySlug;
-using VibeTree.Application.User;
-using VibeTree.Application.User.Create.Commands;
-using VibeTree.Application.User.Delete.Commands;
-using VibeTree.Application.User.Get.ById;
-using VibeTree.Application.User.Login;
-using VibeTree.Application.User.Update.Commands;
-using VibeTree.Infrastructure.AppDbContext;
+using System.Text;
+using VibeTree.Features.Perfil;
+using VibeTree.Features.Perfil.Get.GetById;
+using VibeTree.Features.Perfil.Get.GetBySlug;
+using VibeTree.Features.User;
+using VibeTree.Features.User.CreateUser.Commands;
+using VibeTree.Features.User.Delete.Commands;
+using VibeTree.Features.User.Get.ById;
+using VibeTree.Features.User.Login;
+using VibeTree.Features.User.Update.Commands;
+using VibeTree.Shared.Auth;
+using VibeTree.Shared.Common;
+using VibeTree.Shared.DbAppContext;
 using Wolverine;
-using Wolverine.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,14 +37,12 @@ builder.Services.AddDbContext<WriteDbContext>(optionsAction =>
     optionsAction.UseMySql(connectionWrite, ServerVersion.AutoDetect(connectionWrite))
 );
 
-builder.Services.AddScoped<IWriteDbContext, WriteDbContext>();
 
 string connectionRead = builder.Configuration.GetConnectionString("ReadDb") ?? throw new ArgumentException();
 
 builder.Services.AddDbContext<ReadDbContext>(optionsAction =>
     optionsAction.UseMySql(connectionRead, ServerVersion.AutoDetect(connectionRead))
 );
-builder.Services.AddScoped<IReadDbContext, ReadDbContext>();
 
 builder.Services.AddOpenApi(optionsAction =>
 {
@@ -85,21 +84,19 @@ builder.Services.AddOpenApi(optionsAction =>
   
 });
 
-builder.Services.ConfigureServicesApplication(builder.Configuration);
 
 
 builder.Host.UseWolverine(opts =>
 {
     opts.Policies.UseDurableLocalQueues();
-    opts.Services.AddDbContextWithWolverineIntegration<WriteDbContext>(options =>
-        options.UseMySql(connectionWrite, ServerVersion.AutoDetect(connectionWrite)));
+    opts.Policies.AutoApplyIdempotencyOnNonTransactionalHandlers();
 
     opts.Discovery.IncludeAssembly(typeof(CreateUserAndProfileCommand).Assembly);
     opts.Discovery.IncludeAssembly(typeof(DeleteUserCommand).Assembly);
     opts.Discovery.IncludeAssembly(typeof(UpdateUserCommand).Assembly);
 
-    opts.CodeGeneration.AlwaysUseServiceLocationFor<IWriteDbContext>();
-    opts.CodeGeneration.AlwaysUseServiceLocationFor<IReadDbContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<WriteDbContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<ReadDbContext>();
 
 
     opts.Policies.ConfigureConventionalLocalRouting();
@@ -119,8 +116,13 @@ if (!builder.Environment.IsDevelopment())
     });
 }
 
+ConfigJWT(builder.Services, builder.Configuration);
 
-
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
+builder.Services.AddScoped<IValidator<CreateUserAndProfileCommand>, CreateUserAndProfileValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
+builder.Services.AddScoped<IValidator<DeleteUserCommand>, DeleteUserValidator>();
 
 
 const string policy = "_myAllowSpecificOrigins";
@@ -179,10 +181,8 @@ app.MapPost("/user", async (IMessageBus bus, [FromBody] CreateUserAndProfileComm
 
         Result<Userlogin> result = await bus.InvokeAsync<Result<Userlogin>>(createUserCommand);
 
-
         if (!result.IsSuccess)
             return Results.BadRequest(result);
-
 
         return Results.Ok(result);
 });
@@ -194,9 +194,8 @@ app.MapPatch("/user", async (IMessageBus bus,[FromBody] UpdateUserCommand update
         if (!result.IsSuccess)
             return Results.BadRequest(result);
 
-
         return Results.Ok(result);
- });
+});
 
 app.MapDelete("/user/{id}", async (IMessageBus bus,string id) => {
 
@@ -205,11 +204,8 @@ app.MapDelete("/user/{id}", async (IMessageBus bus,string id) => {
     if (!result.IsSuccess)
         return Results.BadRequest(result);
 
-
     return Results.Ok(result);
 });
-
-
 
 app.MapPost("/auth/login", async (IMessageBus bus, [FromBody] LoginQuery loginQuery) => {
 
@@ -217,7 +213,6 @@ app.MapPost("/auth/login", async (IMessageBus bus, [FromBody] LoginQuery loginQu
 
     if (!result.IsSuccess)
         return Results.BadRequest(result);
-
 
     return Results.Ok(result);
 
@@ -242,4 +237,27 @@ app.MapGet("/user/me", async(IMessageBus bus, ClaimsPrincipal user ) =>
 
 return await app.RunJasperFxCommands(args);
 
+
+static void ConfigJWT(IServiceCollection services, IConfiguration configuration)
+{
+    var jwt = configuration.GetSection("JwtSettings");
+    var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["secret_key"]));
+
+    services.AddAuthentication("Bearer").AddJwtBearer(options =>
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwt["Issuer"],
+            //ValidAudience = jwt[Audience],
+            IssuerSigningKey = secretKey
+        }
+    );
+
+    services.AddAuthorization();
+
+
+}
 public partial class Program { }
