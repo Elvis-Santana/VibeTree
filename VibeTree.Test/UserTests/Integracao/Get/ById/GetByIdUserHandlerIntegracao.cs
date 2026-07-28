@@ -9,7 +9,7 @@ using System.Net.Http.Json;
 using VibeTree.Application.Auth;
 using VibeTree.Application.Common;
 using VibeTree.Application.User;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Test.UserTests.Integracao.Get.ById;
@@ -43,7 +43,7 @@ public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory) :
     public async Task Deve_Criar_Retornar_Usuario_Case_Id_Valido_Ou_Se_Usuaior_Existe()
     {
         Guid id = Guid.NewGuid();
-        (Domain.Entity.User user, Perfil perfil) userPerfil = StartEntityUserPerfil(id);
+        (User user, Perfil perfil) userPerfil = StartEntityUserPerfil(id);
 
         await using var scope = factory.Services.CreateAsyncScope();
 
@@ -72,7 +72,7 @@ public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory) :
     public async Task Deve_Criar_Retornar_Erro_De_Id_Invalid_E_Usuaior_Nao_Existe()
     {
         Guid id = Guid.Empty;
-        (Domain.Entity.User user, Perfil perfil) userPerfil = StartEntityUserPerfil(id);
+        (User user, Perfil perfil) userPerfil = StartEntityUserPerfil(id);
 
         await using var scope = factory.Services.CreateAsyncScope();
         var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
@@ -91,10 +91,10 @@ public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory) :
 
       
     }
-    static ( Domain.Entity.User user,  Perfil perfil) StartEntityUserPerfil(Guid id )
+    static (User user,  Perfil perfil) StartEntityUserPerfil(Guid id )
     {
         string pwd = string.Empty;
-        Domain.Entity.User user  = new Faker<Domain.Entity.User>("pt_BR")
+        User user  = new Faker<User>("pt_BR")
             .CustomInstantiator(f =>
             {
                 pwd = f.Internet.Password();
@@ -120,7 +120,7 @@ public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory) :
         ));
     }
 
-    private async Task AddUserToContextsAsync(Domain.Entity.User user, Perfil perfil)
+    private async Task AddUserToContextsAsync(User user, Perfil perfil)
     {
         using var scope = factory.Services.CreateScope();
 

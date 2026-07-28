@@ -18,6 +18,7 @@ using VibeTree.Application.Interfaces.IQueryJob;
 using VibeTree.Application.Sync;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Create.Commands;
+using VibeTree.Entity;
 using VibeTree.Test.EntityTest;
 using Wolverine;
 using ValidationResult = FluentValidation.Results.ValidationResult;
@@ -84,7 +85,7 @@ public class CreateUserAndProfileHandlerUnitario
             faker.Internet.Password(),
             createUserCommand.Email);
 
-        var listaUsuarios = new List<Domain.Entity.User> { usuarioExistente };
+        var listaUsuarios = new List<User> { usuarioExistente };
         var usersSetMock = listaUsuarios.BuildMockDbSet();
 
         _dbMock.Users.Returns(usersSetMock);
@@ -120,17 +121,17 @@ public class CreateUserAndProfileHandlerUnitario
            .ValidateAsync(Arg.Any<CreateUserAndProfileCommand>())
            .Returns(new ValidationResult());
 
-        var listaUsuarios = new List<Domain.Entity.User>();
+        var listaUsuarios = new List<User>();
         var usersSetMock = listaUsuarios.BuildMockDbSet();
         _dbMock.Users.Returns(usersSetMock);
 
-        var listaPerfils = new List<Domain.Entity.Perfil>();
+        var listaPerfils = new List<Perfil>();
         var perfilsSetMock = listaPerfils.BuildMockDbSet();
         _dbMock.perfils.Returns(perfilsSetMock);
 
 
 
-        _tokenMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>())
+        _tokenMock.CriarToken(Arg.Any<User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token(expectedToken)));
 
 
@@ -148,7 +149,7 @@ public class CreateUserAndProfileHandlerUnitario
    
         await _tokenMock
             .Received()
-            .CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>());
+            .CriarToken(Arg.Any<User>(), Arg.Any<Perfil>());
     }
 
 

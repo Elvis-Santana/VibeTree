@@ -8,7 +8,7 @@ using VibeTree.Application.Auth;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using BCryptNet = BCrypt.Net.BCrypt;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -72,7 +72,7 @@ public class LoginHandlerUnitario
         _readDbContextMock.perfils.Returns(perfilsSetMock);
 
 
-        _tokenServiceMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Perfil>())
+        _tokenServiceMock.CriarToken(Arg.Any<User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token(token)));
 
         var handler =

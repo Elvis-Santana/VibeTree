@@ -11,6 +11,7 @@ using VibeTree.Application.Interfaces;
 using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Get.ById;
+using VibeTree.Entity;
 
 namespace VibeTree.Test.UserTests.Unitario.Get.ById;
 
@@ -21,7 +22,7 @@ public class GetByIdUserHandlerUnitario
     [Fact]
     public async Task Shoud_Retornar_Error_Nao_Encontrado()
     {
-        readDbContextMock.Users.FindAsync(Arg.Any<Guid>()).Returns(ValueTask.FromResult<Domain.Entity.User>(null));
+        readDbContextMock.Users.FindAsync(Arg.Any<Guid>()).Returns(ValueTask.FromResult<User>(null));
 
         GetByIdUserQuery getByIdUserQuery = new(Guid.NewGuid().ToString());
         GetByIdUserHandler handler = new (readDbContextMock);
@@ -39,7 +40,7 @@ public class GetByIdUserHandlerUnitario
     [Fact]
     public async Task Shoud_Retornar_Usuario_Id_Valido()
     {
-        var user = new Faker<Domain.Entity.User>("pt_BR")
+        var user = new Faker<User>("pt_BR")
             .CustomInstantiator(u => new(
                 Guid.NewGuid(),
                 DateTime.Now,
@@ -50,7 +51,7 @@ public class GetByIdUserHandlerUnitario
                 )
             ).Generate();
 
-         readDbContextMock.Users.FindAsync(Arg.Any<Guid>()).Returns(ValueTask.FromResult<Domain.Entity.User>(user));
+         readDbContextMock.Users.FindAsync(Arg.Any<Guid>()).Returns(ValueTask.FromResult<User>(user));
 
         GetByIdUserQuery getByIdUserQuery = new(user.Id.ToString());
         GetByIdUserHandler handler = new(readDbContextMock);
@@ -70,7 +71,7 @@ public class GetByIdUserHandlerUnitario
     [Fact]
     public async Task Shoud_Retornar_Error_Id_Vazio()
     {
-        readDbContextMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<Domain.Entity.User>(null));
+        readDbContextMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<User>(null));
 
         GetByIdUserQuery getByIdUserQuery = new("");
         GetByIdUserHandler handler = new(readDbContextMock);

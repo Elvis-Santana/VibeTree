@@ -4,7 +4,7 @@ using VibeTree.Application.Interfaces;
 using VibeTree.Application.Perfil;
 using VibeTree.Application.Perfil.Get.GetById;
 using VibeTree.Application.Common;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 
 namespace VibeTree.Test.PerfilTest.GetByIdTest;
 
@@ -17,7 +17,7 @@ public class GetPerfilByIdHandlerTest
         await using var db = new DbContextBuildConfig();
           var context = await db.CriarContextoReadPreparadoAsync();
 
-        Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
+        User user = new Faker<User>("pt_BR")
             .CustomInstantiator(f => new(Guid.NewGuid(),
                 DateTime.Now,
                 DateTime.Now,

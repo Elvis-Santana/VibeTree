@@ -7,7 +7,7 @@ using VibeTree.Application.Auth;
 using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User.Update.Commands;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using Wolverine;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -135,7 +135,7 @@ public class UpdateUserHandlerUnitario
               .Returns(new ValidationResult());
 
         _dbMock.SaveChangesAsync().Returns(Task.FromResult(1));
-        _tokenMock.CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>())
+        _tokenMock.CriarToken(Arg.Any<User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token("tok")));
 
 
@@ -150,15 +150,15 @@ public class UpdateUserHandlerUnitario
         BCrypt.Net.BCrypt.Verify(newPassword, user.PasswordHash).Should().BeTrue();
 
         await _dbMock.Received(1).SaveChangesAsync();
-        await _tokenMock.Received(1).CriarToken(Arg.Any<Domain.Entity.User>(), Arg.Any<Domain.Entity.Perfil>());
+        await _tokenMock.Received(1).CriarToken(Arg.Any<User>(), Arg.Any<Perfil>());
 
 
 
     }
 
-    private void SetupUserAndPerfilMocks(Domain.Entity.User user)
+    private void SetupUserAndPerfilMocks(User user)
     {
-        var listaUser = new List<Domain.Entity.User>() { user };
+        var listaUser = new List<User>() { user };
         var mockDbSetUser = listaUser.BuildMockDbSet();
         _dbMock.Users.Returns(mockDbSetUser);
 
@@ -173,7 +173,7 @@ public class UpdateUserHandlerUnitario
               user.Id
           );
 
-        var listaPerfil = new List<Domain.Entity.Perfil>() { perfil };
+        var listaPerfil = new List<Perfil>() { perfil };
         var mockDbSetPerfil = listaPerfil.BuildMockDbSet();
         _dbMock.perfils.Returns(mockDbSetPerfil);
     }

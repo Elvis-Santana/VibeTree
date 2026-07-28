@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VibeTree.Domain.Entity;
+namespace VibeTree.Entity;
 
 public class User : EntityBase
 {

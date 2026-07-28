@@ -8,7 +8,7 @@ using System.Net.Http.Json;
 using VibeTree.Application.Common;
 using VibeTree.Application.User.Delete.Commands;
 using VibeTree.Application.User.Login;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Test.UserTests.Integracao.Delete;

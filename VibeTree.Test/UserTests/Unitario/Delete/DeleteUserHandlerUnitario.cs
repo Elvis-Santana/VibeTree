@@ -6,6 +6,7 @@ using NSubstitute;
 using VibeTree.Application.Common;
 using VibeTree.Application.Interfaces;
 using VibeTree.Application.User.Delete.Commands;
+using VibeTree.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Delete;
@@ -53,7 +54,7 @@ public class DeleteUserHandlerUnitario
             .Returns(new ValidationResult());
 
         DeleteUserCommand deleteUserCommand = new(Guid.NewGuid().ToString());
-        _dbMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<Domain.Entity.User>(null));
+        _dbMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult<User>(null));
 
         var hanlder = await DeleteHandler(deleteUserCommand);
 
@@ -68,7 +69,7 @@ public class DeleteUserHandlerUnitario
     public async Task Handler_Deve_Deletar_Usuario()
     {
 
-        var user = new Faker<Domain.Entity.User>("pt_BR")
+        var user = new Faker<User>("pt_BR")
              .CustomInstantiator(u => new Domain.Entity.User(
                  Guid.NewGuid(),
                  DateTime.UtcNow,
@@ -84,7 +85,7 @@ public class DeleteUserHandlerUnitario
         DeleteUserCommand deleteUserCommand = new(user.Id.ToString());
         _dbMock.Users.FindAsync(Arg.Any<Guid>())!.Returns(ValueTask.FromResult(user));
 
-        _dbMock.Users.Remove(Arg.Any<Domain.Entity.User>());
+        _dbMock.Users.Remove(Arg.Any<User>());
 
         _dbMock.SaveChangesAsync().Returns(Task.FromResult(1));
 

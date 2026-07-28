@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using VibeTree.Application.Auth;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace VibeTree.Test.ServiceTest.TokenServiceTest;
@@ -68,7 +68,7 @@ public class TokenServiceTest
 
     }
 
-    private Domain.Entity.User CriarUsuarioValido()
+    private User CriarUsuarioValido()
     {
         return new Domain.Entity.User(
             Guid.NewGuid(),
@@ -80,7 +80,7 @@ public class TokenServiceTest
         );
     }
 
-    private Perfil CriarPerfilValidoPara(Domain.Entity.User user)
+    private Perfil CriarPerfilValidoPara(User user)
     {
         return new Perfil(
             Guid.NewGuid(),

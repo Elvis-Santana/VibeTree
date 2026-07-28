@@ -8,7 +8,7 @@ using System.Net.Http.Json;
 using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Login;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Test.UserTests.Integracao.Login;
@@ -48,7 +48,7 @@ public class LoginHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyn
         Guid id = Guid.NewGuid();
         string pwd = string.Empty;
 
-        Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
+        User user = new Faker<User>("pt_BR")
         .CustomInstantiator(f =>
         {
             pwd = f.Internet.Password();
@@ -91,7 +91,7 @@ public class LoginHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyn
     {
         Guid id = Guid.NewGuid();
 
-        Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
+        User user = new Faker<User>("pt_BR")
         .CustomInstantiator(f =>
         {
             return new(
@@ -118,7 +118,7 @@ public class LoginHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyn
 
     }
 
-    private async Task AddUserToContextsAsync(Domain.Entity.User user)
+    private async Task AddUserToContextsAsync(User user)
     {
 
         Perfil perfil = new(

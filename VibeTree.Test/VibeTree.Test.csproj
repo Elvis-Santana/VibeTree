@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VibeTree.Application\VibeTree.Application.csproj" />
-    <ProjectReference Include="..\VibeTree.Domain\VibeTree.Domain.csproj" />
     <ProjectReference Include="..\VibeTree.Infrastructure\VibeTree.Infrastructure.csproj" />
     <ProjectReference Include="..\VibeTree\VibeTree.csproj" />
   </ItemGroup>

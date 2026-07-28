@@ -10,7 +10,7 @@ using System.Net.Http.Json;
 using VibeTree.Application.Common;
 using VibeTree.Application.User;
 using VibeTree.Application.User.Update.Commands;
-using VibeTree.Domain.Entity;
+using VibeTree.Entity;
 using VibeTree.Infrastructure.AppDbContext;
 
 namespace VibeTree.Test.UserTests.Integracao.Update;
@@ -77,7 +77,7 @@ public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : 
     public async Task UpdateUserHandler_Should_Update_Sem_Senha_User()
     {
         Guid id = Guid.NewGuid();
-        Domain.Entity.User user = new Faker<Domain.Entity.User>("pt_BR")
+        User user = new Faker<User>("pt_BR")
         .CustomInstantiator(f => new(
             id,
             DateTime.UtcNow,
