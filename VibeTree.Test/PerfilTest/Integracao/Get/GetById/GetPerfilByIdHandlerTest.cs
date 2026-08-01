@@ -1,17 +1,17 @@
 ﻿using Bogus;
 using FluentAssertions;
 using VibeTree.Features.Perfil;
-using VibeTree.Features.Perfil.Get.GetBySlug;
+using VibeTree.Features.Perfil.Get.GetById;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.PerfilTest.GetSlugTest;
+namespace VibeTree.Test.PerfilTest.Integracao.Get.GetById;
 
-public class GetPerfilBySlugHandlerTest
+public class GetPerfilByIdHandlerTest
 {
 
     [Fact]
-    public async Task GetPerfilBySlugHandler_Should_QueryBySlug_Perfil()
+    public async Task GetPerfilByIdHandler_Should_QueryById_Perfil()
     {
         await using var db = new DbContextBuildConfig();
           var context = await db.CriarContextoReadPreparadoAsync();
@@ -26,7 +26,7 @@ public class GetPerfilBySlugHandlerTest
             ).Generate();
 
         var perfil = new Faker<Perfil>("pt_BR")
-           .CustomInstantiator(f =>
+           .CustomInstantiator(f => 
                new(Guid.NewGuid(),
                DateTime.Now,
                DateTime.Now,
@@ -42,8 +42,9 @@ public class GetPerfilBySlugHandlerTest
         await context.SaveChangesAsync();
 
 
-        GetPerfilBySlugQuery perfilBySlug = new(perfil.Slug);
-        Result<PerfilResponse> result = await new GetPerfilBySlugHandler(context).Handle(perfilBySlug);
+        GetPerfilByIdQuery perfilByIdQuery = new (perfil.Id.ToString());
+        Result<PerfilResponse> result = await new GetPerfilByIdHandler(context).Handle(perfilByIdQuery);
+
 
 
         result.IsSuccess.Should().BeTrue();
@@ -52,19 +53,18 @@ public class GetPerfilBySlugHandlerTest
     }
 
     [Fact]
-    public async Task GetPerfilBySlugHandler_Should_QueryBySlug_Perfil_Error()
+    public async Task GetPerfilByIdHandler_Should_Not_Found_Perfil()
     {
         await using var db = new DbContextBuildConfig();
-        var context = await db.CriarContextoReadPreparadoAsync();
+         var context = await db.CriarContextoReadPreparadoAsync();
 
-     
 
-        GetPerfilBySlugQuery perfilBySlug = new(Guid.NewGuid().ToString());
-        Result<PerfilResponse> result = await new GetPerfilBySlugHandler(context).Handle(perfilBySlug);
-
+        GetPerfilByIdQuery perfilByIdQuery = new(Guid.NewGuid().ToString());
+        Result<PerfilResponse> result = await new GetPerfilByIdHandler(context).Handle(perfilByIdQuery);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
-        
+      
     }
+
 }

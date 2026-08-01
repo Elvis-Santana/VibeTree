@@ -44,4 +44,9 @@
 		</None>
 	</ItemGroup>
 	
+	<ItemGroup>
+	  <Folder Include="LinkTest\" />
+	  <Folder Include="PerfilTest\Unitario\" />
+	</ItemGroup>
+	
 </Project>
