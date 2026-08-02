@@ -15,6 +15,7 @@ public class Perfil : EntityBase
     public string Slug { get; private set; }
 
     public Guid IdUser { get; private set; }
+    public virtual ICollection<Link> Links { get; private set; }
 
     private Perfil() : base() { }
 
