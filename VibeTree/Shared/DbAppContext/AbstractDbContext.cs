@@ -25,8 +25,16 @@ public abstract class AbstractDbContext : DbContext
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Link>()
-          .HasKey(l => l.Id);
+        modelBuilder.Entity<Link>(l =>
+        {
+            l.HasKey(l => l.Id);
+
+            l.HasOne<Perfil>()
+            .WithMany(p => p.Links)
+            .HasForeignKey(l => l.IdPerfil)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        });
        
         modelBuilder.Entity<User>(u =>
         {
@@ -44,16 +52,6 @@ public abstract class AbstractDbContext : DbContext
 
             u.Property(x => x.Id)
             .ValueGeneratedNever();
-
-  
-
-            u.HasMany(x => x.Links)
-           .WithOne()
-           .HasForeignKey(l => l.IdUser)
-           .OnDelete(DeleteBehavior.Cascade);
-
-
-
         });
 
 
@@ -82,6 +80,7 @@ public abstract class AbstractDbContext : DbContext
             .IsRequired(false);
 
 
+        
         });
 
         base.OnModelCreating(modelBuilder);
