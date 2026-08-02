@@ -13,9 +13,8 @@ using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace VibeTree.Test.UserTests.Unitario.Create;
 
-public class CreateUserAndProfileHandlerUnitario
+public class CreateUserAndProfileHandlerUnitario(DbContextBuildConfig _dbFixture) : IClassFixture<DbContextBuildConfig>
 {
-    private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
 
     private readonly ITokenService _tokenMock =  Substitute.For<ITokenService>();
 
@@ -40,12 +39,12 @@ public class CreateUserAndProfileHandlerUnitario
             .Returns(erros);
 
         var createUserCommand = new CreateUserAndProfileCommand("", "", "", "");
-        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock);
+        using var writeDbContext = await _dbFixture.CreateWriteContext();
+        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, writeDbContext, _tokenMock, _validatorMock);
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(erros.Errors.Count());
 
-        await _dbMock.DidNotReceive().SaveChangesAsync();
         await _tokenMock.DidNotReceiveWithAnyArgs().CriarToken(default!, default!);
     }
 
@@ -54,13 +53,13 @@ public class CreateUserAndProfileHandlerUnitario
     {
 
         var faker = new Faker("pt_BR");
-        var createUserCommand = new CreateUserAndProfileCommand(
+        var createUserCommand = new Faker<CreateUserAndProfileCommand>("pt_BR")
+            .CustomInstantiator(f => new(
             faker.Internet.UserName(),
             faker.Internet.Password(),
             faker.Internet.Email(),
             faker.Internet.UserName()
-
-        );
+        )).Generate();
 
         _validatorMock
             .ValidateAsync(Arg.Any<CreateUserAndProfileCommand>())
@@ -72,12 +71,11 @@ public class CreateUserAndProfileHandlerUnitario
             faker.Internet.Password(),
             createUserCommand.Email);
 
-        var listaUsuarios = new List<User> { usuarioExistente };
-        var usersSetMock = listaUsuarios.BuildMockDbSet();
+        using var writeDbContext = await _dbFixture.CreateWriteContext();
+        await writeDbContext.Users.AddAsync(usuarioExistente);
+        await writeDbContext.SaveChangesAsync();
 
-        _dbMock.Users.Returns(usersSetMock);
-
-        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, _dbMock, _tokenMock, _validatorMock); ;
+        var (result,_) = await  CreateUserAndProfileHandler.Handle(createUserCommand, writeDbContext, _tokenMock, _validatorMock); ;
 
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
@@ -88,10 +86,6 @@ public class CreateUserAndProfileHandlerUnitario
     [Fact]
     public async Task Handle_DeveCriarUsuarioComSucesso()
     {
-
-        await using var dbContext = new DbContextBuildConfig();
-        var context = await dbContext.CriarContextoWritePreparadoAsync();
-
         // Arrange
         var createUserCommand = new Faker<CreateUserAndProfileCommand>("pt_BR")
             .CustomInstantiator(f => new CreateUserAndProfileCommand(
@@ -108,19 +102,13 @@ public class CreateUserAndProfileHandlerUnitario
            .ValidateAsync(Arg.Any<CreateUserAndProfileCommand>())
            .Returns(new ValidationResult());
 
-        var listaUsuarios = new List<User>();
-        var usersSetMock = listaUsuarios.BuildMockDbSet();
-        _dbMock.Users.Returns(usersSetMock);
-
-        var listaPerfils = new List<Perfil>();
-        var perfilsSetMock = listaPerfils.BuildMockDbSet();
-        _dbMock.perfils.Returns(perfilsSetMock);
-
+        using var writeDbContext = await _dbFixture.CreateWriteContext();
+     
         _tokenMock.CriarToken(Arg.Any<User>(), Arg.Any<Perfil>())
             .Returns(Task.FromResult(new Token(expectedToken)));
 
         // Act
-        var (result,_) = await   CreateUserAndProfileHandler.Handle(createUserCommand, context, _tokenMock, _validatorMock); 
+        var (result,_) = await   CreateUserAndProfileHandler.Handle(createUserCommand, writeDbContext, _tokenMock, _validatorMock); 
 
         // Assert
         result.IsSuccess.Should().BeTrue();
