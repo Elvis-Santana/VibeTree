@@ -8,23 +8,23 @@ namespace VibeTree.Shared.Entity;
 
 public class Link : EntityBase
 {
-    public string LinkUrl { get; }
-    public string Descricao { get; }
+    public string LinkUrl { get; private set; }
+    public string Descricao { get; private set; }
 
-    public Guid IdUser { get; }
+    public Guid IdPerfil { get;private set; }
 
-    public int Order { get; }
+    public decimal Order { get; private set; }
 
-    public bool Ativo { get; }
+    public bool Ativo { get; private set; }
 
 
     private Link() : base() { }
 
-    public Link(Guid id, DateTime createdAt, DateTime updatedAt, string linkUrl, string descricao, Guid idUser, int order, bool ativo) : base(id, createdAt, updatedAt)
+    public Link(Guid id, DateTime createdAt, DateTime updatedAt, string linkUrl, string descricao, Guid idPerfil, decimal order, bool ativo) : base(id, createdAt, updatedAt)
     {
         LinkUrl = linkUrl;
         Descricao = descricao;
-        IdUser = idUser;
+        IdPerfil = idPerfil;
         Order = order;
         Ativo = ativo;
     }
