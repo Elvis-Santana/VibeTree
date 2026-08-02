@@ -11,11 +11,12 @@ using VibeTree.Shared.Auth;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
+using Xunit.Abstractions;
 
 namespace VibeTree.Test.UserTests.Integracao.Get.ById;
 
 [Collection(IntegrationCollection.Name)]
-public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class GetByIdUserHandlerIntegracao(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
 {
     private readonly HttpClient _httpClient = factory.CreateClient();
 
