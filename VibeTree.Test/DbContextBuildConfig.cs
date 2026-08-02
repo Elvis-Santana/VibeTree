@@ -23,20 +23,17 @@ public  class DbContextBuildConfig : IAsyncDisposable
          .UseSqlite(_sqliteConnection)
          .Options;
 
+        using var setupContext = new WriteDbContext(_writeOptions);
+        setupContext.Database.EnsureCreated();
     }
 
-    public async Task<WriteDbContext> CriarContextoWritePreparadoAsync()
-    {
-        var context = new WriteDbContext(_writeOptions);
-        await  context.Database.EnsureCreatedAsync();
-        return context;
-    }
-    public async Task<ReadDbContext> CriarContextoReadPreparadoAsync()
-    {
-        var context = new ReadDbContext(_readOptions);
-        await context.Database.EnsureCreatedAsync();
-        return context;
-    }
+    public async Task<WriteDbContext> CreateWriteContext()=>
+         new WriteDbContext(_writeOptions);
+       
+    public async Task<ReadDbContext> CreateReadContext()=>
+        new ReadDbContext(_readOptions);
+        
+    
 
 
     public async ValueTask DisposeAsync()
