@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,14 +26,26 @@ public abstract class AbstractDbContext : DbContext
   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.Entity<Link>(l =>
         {
             l.HasKey(l => l.Id);
+            
+
+            l.Property(l => l.LinkUrl);
+            l.Property(l => l.Ativo)
+            .HasDefaultValue(true);
+            l.Property(l => l.Order);
+            l.Property(l => l.Descricao).HasMaxLength(255);
+
+            l.Property(x => x.CreatedAt);
+            l.Property(x => x.UpdatedAt);
 
             l.HasOne<Perfil>()
             .WithMany(p => p.Links)
             .HasForeignKey(l => l.IdPerfil)
             .OnDelete(DeleteBehavior.Cascade);
+
 
         });
        
@@ -85,4 +98,6 @@ public abstract class AbstractDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
+   
 }
