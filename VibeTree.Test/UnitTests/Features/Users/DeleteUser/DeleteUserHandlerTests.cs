@@ -9,9 +9,9 @@ using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace VibeTree.Test.UserTests.Unitario.Delete;
+namespace VibeTree.Test.UnitTests.Features.Users.DeleteUser;
 
-public class DeleteUserHandlerUnitario
+public class DeleteUserHandlerTests
 {
     private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
     private readonly IValidator<DeleteUserCommand> _validatorMock = Substitute.For<IValidator<DeleteUserCommand>>();

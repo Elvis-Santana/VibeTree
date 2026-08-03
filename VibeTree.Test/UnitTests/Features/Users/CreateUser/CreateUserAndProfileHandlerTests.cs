@@ -11,9 +11,9 @@ using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace VibeTree.Test.UserTests.Unitario.Create;
+namespace VibeTree.Test.UnitTests.Features.Users.CreateUser;
 
-public class CreateUserAndProfileHandlerUnitario(DbContextBuildConfig _dbFixture) : IClassFixture<DbContextBuildConfig>
+public class CreateUserAndProfileHandlerTests(DbContextBuildConfig _dbFixture) : IClassFixture<DbContextBuildConfig>
 {
 
     private readonly ITokenService _tokenMock =  Substitute.For<ITokenService>();

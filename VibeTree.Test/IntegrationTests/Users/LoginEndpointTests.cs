@@ -11,10 +11,10 @@ using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.UserTests.Integracao.Login;
+namespace VibeTree.Test.IntegrationTests.Users;
 
 [Collection(IntegrationCollection.Name)]
-public class LoginHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class LoginEndpointTests(CustomWebApplicationFactory factory) : IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();

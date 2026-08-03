@@ -11,10 +11,10 @@ using VibeTree.Features.User.CreateUser.Commands;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using Xunit.Abstractions;
-namespace VibeTree.Test.UserTests.Integracao.Create;
+namespace VibeTree.Test.IntegrationTests.Users;
 
 [Collection(IntegrationCollection.Name)]
-public class CreateUserAndProfileHandlerIntegracao(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
+public class CreateUserAndProfileEndpointTests(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();

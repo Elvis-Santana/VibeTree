@@ -7,9 +7,9 @@ using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.UserTests.Unitario.Get.ById;
+namespace VibeTree.Test.UnitTests.Features.Users.GetByIdUser;
 
-public class GetByIdUserHandlerUnitario
+public class GetByIdUserHandlerTests
 {
     private ReadDbContext readDbContextMock = Substitute.For<ReadDbContext>();
 

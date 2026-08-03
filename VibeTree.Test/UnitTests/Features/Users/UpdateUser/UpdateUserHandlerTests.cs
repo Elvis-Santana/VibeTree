@@ -10,9 +10,9 @@ using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace VibeTree.Test.UserTests.Unitario.Update;
+namespace VibeTree.Test.UnitTests.Features.Users.UpdateUser;
 
-public class UpdateUserHandlerUnitario
+public class UpdateUserHandlerTests
 {
     private readonly WriteDbContext _dbMock = Substitute.For<WriteDbContext>();
     private readonly ITokenService _tokenMock = Substitute.For<ITokenService>();

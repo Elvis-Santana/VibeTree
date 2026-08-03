@@ -4,9 +4,9 @@ using VibeTree.Features.User.CreateUser.Commands;
 using VibeTree.Features.User.DeleteUser.Commands;
 using VibeTree.Features.User.UpdateUser.Commands;
 
-namespace VibeTree.Test.UserTests.Unitario.Validate;
+namespace VibeTree.Test.UnitTests.Features.Users.CreateUser;
 
-public class ValidatorUserUnitario
+public class ValidatorUserTest
 {
 
     [Theory]

@@ -12,9 +12,9 @@ using VibeTree.Shared.Entity;
 using BCryptNet = BCrypt.Net.BCrypt;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace VibeTree.Test.UserTests.Unitario.Login;
+namespace VibeTree.Test.UnitTests.Features.Users.LoginUser;
 
-public class LoginHandlerUnitario
+public class LoginHandlerTests
 {
     private readonly ReadDbContext _readDbContextMock =
         Substitute.For<ReadDbContext>();

@@ -13,10 +13,10 @@ using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.UserTests.Integracao.Update;
+namespace VibeTree.Test.IntegrationTests.Users;
 
 [Collection(IntegrationCollection.Name)]
-public class UpdateUserHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class UpdateUserEndpointTests(CustomWebApplicationFactory factory) : IAsyncLifetime
 {
     private readonly HttpClient client = factory.CreateClient();
     private readonly CustomWebApplicationFactory _factory = factory;

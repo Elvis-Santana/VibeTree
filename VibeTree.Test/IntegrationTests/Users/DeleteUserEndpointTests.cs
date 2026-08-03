@@ -9,11 +9,11 @@ using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.UserTests.Integracao.Delete;
+namespace VibeTree.Test.IntegrationTests.Users;
 
 [Collection(IntegrationCollection.Name)]
 
-public class DeleteUserHandlerIntegracao(CustomWebApplicationFactory factory) : IAsyncLifetime
+public class DeleteUserEndpointTests(CustomWebApplicationFactory factory) : IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
