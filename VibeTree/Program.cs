@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using VibeTree.Features.Link.CreateLink;
+using VibeTree.Features.Link.CreateLink.Commands;
 using VibeTree.Features.Perfil;
 using VibeTree.Features.Perfil.Get.GetById;
 using VibeTree.Features.Perfil.Get.GetBySlug;
@@ -123,6 +125,7 @@ builder.Services.AddScoped<IValidator<LoginQuery>, LoginValidator>();
 builder.Services.AddScoped<IValidator<CreateUserAndProfileCommand>, CreateUserAndProfileValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
 builder.Services.AddScoped<IValidator<DeleteUserCommand>, DeleteUserValidator>();
+builder.Services.AddScoped<IValidator<CreateLinkCommand>, CreateLinkValidator>();
 
 
 const string policy = "_myAllowSpecificOrigins";
@@ -206,6 +209,18 @@ app.MapDelete("/user/{id}", async (IMessageBus bus,string id) => {
 
     return Results.Ok(result);
 });
+
+app.MapPost("/link", async (IMessageBus bus, [FromBody] CreateLinkCommand createLinkCommand) => {
+
+    Result<LinkResponse> result = await bus.InvokeAsync<Result<LinkResponse>>(createLinkCommand);
+
+    if (!result.IsSuccess)
+        return Results.BadRequest(result);
+
+    return Results.Ok(result);
+});
+
+
 
 app.MapPost("/auth/login", async (IMessageBus bus, [FromBody] LoginQuery loginQuery) => {
 
