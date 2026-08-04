@@ -14,16 +14,16 @@ public class LinkTest
         // Arrange
         string linkUrl = _faker.Internet.Url();
         string descricao = _faker.Lorem.Sentence();
-        Guid idUser = Guid.NewGuid();
+        Guid perfil = Guid.NewGuid();
         Guid id = Guid.NewGuid();
-        int order = _faker.Random.Int(1, 100);
+        decimal order = _faker.Random.Decimal(1, 1000);
         bool ativo = true;
         DateTime createdAt = DateTime.UtcNow;
         DateTime updatedAt = DateTime.UtcNow;
 
         //act
 
-        var link = new Link(id, createdAt, updatedAt, linkUrl, descricao, idUser, order, ativo);
+        var link = new Link(id, createdAt, updatedAt, linkUrl, descricao, perfil, order, ativo);
         //assert
 
         link.Id.Should().Be(id);
@@ -31,7 +31,7 @@ public class LinkTest
         link.UpdatedAt.Should().Be(updatedAt);
         link.LinkUrl.Should().Be(linkUrl);
         link.Descricao.Should().Be(descricao);
-        link.IdUser.Should().Be(idUser);
+        link.IdPerfil.Should().Be(perfil);
         link.Order.Should().Be(order);
         link.Ativo.Should().Be(ativo);
     }
