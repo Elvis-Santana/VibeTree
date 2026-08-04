@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using System;
@@ -10,15 +11,15 @@ using VibeTree.Features.Perfil.Get.GetBySlug;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.PerfilTest.Unitario.Get.GetBySlug;
+namespace VibeTree.Test.UnitTests.Features.Perfils.GetBySlugPerfil;
 
-public class GetPerfilBySlugHandlerUnitarioTest(DbContextBuildConfig _dbFixture) : IClassFixture<DbContextBuildConfig>
+public class GetPerfilBySlugHandlerTests
 {
 
     [Fact]
     public async Task Shoud_Retornar_Error_Nao_Encontrado()
     {
-        await using var readDbContext = await _dbFixture.CreateReadContext() ;
+        await using var readDbContext = await new DbContextBuildConfig().CreateReadContext() ;
 
         var handler = new GetPerfilBySlugHandler(readDbContext);
         var result = await handler.Handle(new GetPerfilBySlugQuery("slug-nao-existe"));
@@ -32,14 +33,17 @@ public class GetPerfilBySlugHandlerUnitarioTest(DbContextBuildConfig _dbFixture)
     {
         var (user, perfil) = Utils.GetUserAndPerfil();
 
-        await using (var writeDbContext = await _dbFixture.CreateWriteContext())
+        await using (var writeDbContext = await new DbContextBuildConfig().CreateWriteContext())
         {
             await writeDbContext.Users.AddAsync(user);
             await writeDbContext.perfils.AddAsync(perfil);
             await writeDbContext.SaveChangesAsync();
         }
 
-        await using var readDbContext = await _dbFixture.CreateReadContext();
+        await using var readDbContext = await new DbContextBuildConfig().CreateReadContext();
+            await readDbContext.Users.AddAsync(user);
+            await readDbContext.perfils.AddAsync(perfil);
+            await readDbContext.SaveChangesAsync();
 
         var handler = new GetPerfilBySlugHandler(readDbContext);
 

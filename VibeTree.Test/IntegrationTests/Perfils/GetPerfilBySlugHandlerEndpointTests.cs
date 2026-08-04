@@ -2,22 +2,24 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
+using MySqlX.XDevAPI;
 using System.Net.Http.Json;
 using VibeTree.Features.Perfil;
-using VibeTree.Features.Perfil.Get.GetById;
+using VibeTree.Features.Perfil.Get.GetBySlug;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
+using VibeTree.Test.Setup;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
-namespace VibeTree.Test.PerfilTest.Integracao.Get.GetById;
+namespace VibeTree.Test.IntegrationTests.Perfils;
 
 [Collection(IntegrationCollection.Name)]
-
-public class GetPerfilByIdHandlerIntegracaoTest(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
+public class GetPerfilBySlugHandlerEndpointTests(CustomWebApplicationFactory factory, ITestOutputHelper _output) : IAsyncLifetime
 {
     private readonly HttpClient _httpClient = factory.CreateClient();
+    private readonly ITestOutputHelper _testOutputHelper = _output;
 
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -32,6 +34,7 @@ public class GetPerfilByIdHandlerIntegracaoTest(CustomWebApplicationFactory fact
         await ClearDataAsync(writeDb);
         await ClearDataAsync(readDb);
     }
+
     private static async Task ClearDataAsync(DbContext db)
     {
         await db.Database.EnsureDeletedAsync();
@@ -39,48 +42,45 @@ public class GetPerfilByIdHandlerIntegracaoTest(CustomWebApplicationFactory fact
     }
 
     [Fact]
-    public async Task Should_GetPerfilById_When_PerfilExists()
+    public async Task Shound_GetPerfilBySlug_Where_PerfilExists()
     {
-
         var (user, perfil) = Utils.GetUserAndPerfil();
 
-
-
-        await using ( var scope = factory.Services.CreateAsyncScope())
-        {
+         await using ( var scope = factory.Services.CreateAsyncScope()){
             var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
             var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
+            await readDb.Users.AddAsync(user);
+            await readDb.perfils.AddAsync(perfil);
+            await readDb.SaveChangesAsync();
 
             await writeDb.Users.AddAsync(user);
             await writeDb.perfils.AddAsync(perfil);
             await writeDb.SaveChangesAsync();
 
-
-            await readDb.Users.AddAsync(user);
-            await readDb.perfils.AddAsync(perfil);
-            await readDb.SaveChangesAsync();
-
         }
+        var slugDoTeste = perfil.Slug;
+        _testOutputHelper.WriteLine($"Slug do teste: {slugDoTeste}");
 
-        var result = await _httpClient.GetFromJsonAsync<Result<PerfilResponse>>($"/perfil/{perfil.Id}");
+        var response = await this._httpClient.GetFromJsonAsync<Result<PerfilResponse>>($"/perfil/@{slugDoTeste}");
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Id.Should().Be(perfil.Id);
-        result.Value.IdUser.Should().Be(perfil.IdUser);
+
+        response.IsSuccess.Should().BeTrue();
+        response.Value.Id.Should().Be(perfil.Id);
+        response.Value.IdUser.Should().Be(perfil.IdUser);
     }
 
     [Fact]
-    public async Task Should_NotFound_where_PerfilNotExist()
+    public async Task Shound_NotFound_Where_PerfilNotExists()
     {
-        string id = Guid.NewGuid().ToString();
-        var response = await this._httpClient.GetAsync($"/perfil/{id}");
+        string slug = new Faker("pt_BR").Internet.UserName();
+        var response = await  this._httpClient.GetAsync($"/perfil/@{slug}");
 
-        var result = await response.Content.ReadFromJsonAsync<Result<PerfilResponse>>();
+        Result<PerfilResponse>? result = await response.Content.ReadFromJsonAsync<Result<PerfilResponse>>();
 
-        result.IsSuccess.Should().BeFalse();
+        result!.IsSuccess.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
-      
+
     }
+}
 
   
-}

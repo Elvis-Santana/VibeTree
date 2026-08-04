@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Google.Protobuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,37 +9,43 @@ using VibeTree.Features.Perfil.Get.GetById;
 using VibeTree.Features.Perfil.Get.GetBySlug;
 using VibeTree.Shared.DbAppContext;
 
-namespace VibeTree.Test.PerfilTest.Unitario.Get.GetById;
+namespace VibeTree.Test.UnitTests.Features.Perfils.GetByIdPerfil;
 
-public class GetPerfilByIdHandlerUnitarioTest(DbContextBuildConfig _dbFixture) : IClassFixture<DbContextBuildConfig>
+public class GetPerfilByIdHandlerTests 
 {
   
 
     [Fact]
     public async Task Shoud_Retornar_Error_Nao_Encontrado()
     {
-        await using var readDbContext = await _dbFixture.CreateReadContext();
+        await using var readDbContext = await new DbContextBuildConfig().CreateReadContext();
+            var handler = new GetPerfilByIdHandler(readDbContext);
+            var result = await handler.Handle(new GetPerfilByIdQuery(Guid.NewGuid().ToString()));
 
-        var handler = new GetPerfilByIdHandler(readDbContext);
-        var result = await handler.Handle(new GetPerfilByIdQuery(Guid.NewGuid().ToString()));
+            result.IsSuccess.Should().BeFalse();
+            result.Errors.Should().NotBeEmpty();
+            result.Errors!.First().Message.Should().Be("perfil não encontrado");
+        
 
-        result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().NotBeEmpty();
-        result.Errors!.First().Message.Should().Be("perfil não encontrado");
+    
     }
     [Fact]
     public async Task Shoud_Retornar_PerfilResponse_Quando_Encontrado()
     {
         var (user, perfil) = Utils.GetUserAndPerfil();
-        await using (var writeDbContext = await _dbFixture.CreateWriteContext())
+        await using (var db =  new DbContextBuildConfig())
         {
+            using var writeDbContext  = await db.CreateWriteContext();
+
             await writeDbContext.Users.AddAsync(user);
             await writeDbContext.perfils.AddAsync(perfil);
             await writeDbContext.SaveChangesAsync();
         }
 
-        await using var readDbContext = await _dbFixture.CreateReadContext();
-    
+        await using var readDbContext = await new DbContextBuildConfig().CreateReadContext();
+        await readDbContext.Users.AddAsync(user);
+        await readDbContext.perfils.AddAsync(perfil);
+        await readDbContext.SaveChangesAsync();
 
         var handler = new GetPerfilByIdHandler(readDbContext);
 
