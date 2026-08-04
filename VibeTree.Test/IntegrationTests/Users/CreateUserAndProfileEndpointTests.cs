@@ -10,6 +10,7 @@ using VibeTree.Features.User;
 using VibeTree.Features.User.CreateUser.Commands;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
+using VibeTree.Test.Setup;
 using Xunit.Abstractions;
 namespace VibeTree.Test.IntegrationTests.Users;
 

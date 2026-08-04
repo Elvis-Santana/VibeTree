@@ -11,6 +11,7 @@ using VibeTree.Shared.Auth;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
+using VibeTree.Test.Setup;
 using Xunit.Abstractions;
 
 namespace VibeTree.Test.IntegrationTests.Users;

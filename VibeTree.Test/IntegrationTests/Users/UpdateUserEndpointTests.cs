@@ -12,6 +12,7 @@ using VibeTree.Features.User.UpdateUser.Commands;
 using VibeTree.Shared.Common;
 using VibeTree.Shared.DbAppContext;
 using VibeTree.Shared.Entity;
+using VibeTree.Test.Setup;
 
 namespace VibeTree.Test.IntegrationTests.Users;
 
