@@ -8,23 +8,33 @@ public  class DbContextBuildConfig : IAsyncDisposable
 {
     private readonly DbContextOptions<WriteDbContext> _writeOptions;
     private readonly DbContextOptions<ReadDbContext> _readOptions;
-    private readonly SqliteConnection _sqliteConnection;
-
+    private readonly SqliteConnection _writeConnection;
+    private readonly SqliteConnection _readConnection;
     public DbContextBuildConfig()
     {
-         _sqliteConnection = new SqliteConnection("Filename=:memory:");
-         _sqliteConnection.Open();
+
+
+        _writeConnection = new SqliteConnection($"Data Source=WriteDb_{Guid.NewGuid().ToString()};Mode=Memory;Cache=Shared");
+        _writeConnection.Open();
 
         _writeOptions = new DbContextOptionsBuilder<WriteDbContext>()
-         .UseSqlite(_sqliteConnection)
-         .Options;
+            .UseSqlite(_writeConnection)
+            .Options;
+
+
+        using var setupWriteContext = new WriteDbContext(_writeOptions);
+        setupWriteContext.Database.EnsureCreated();
+
+        _readConnection = new SqliteConnection($"Data Source=ReadDb_{Guid.NewGuid().ToString()};Mode=Memory;Cache=Shared");
+        _readConnection.Open();
 
         _readOptions = new DbContextOptionsBuilder<ReadDbContext>()
-         .UseSqlite(_sqliteConnection)
-         .Options;
+            .UseSqlite(_readConnection)
+            .Options;
 
-        using var setupContext = new WriteDbContext(_writeOptions);
-        setupContext.Database.EnsureCreated();
+        using var setupReadContext = new ReadDbContext(_readOptions);
+        setupReadContext.Database.EnsureCreated();
+
     }
 
     public async Task<WriteDbContext> CreateWriteContext()=>
@@ -38,7 +48,11 @@ public  class DbContextBuildConfig : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _sqliteConnection.CloseAsync();
-        await _sqliteConnection.DisposeAsync();
+        await _readConnection.CloseAsync();
+        await _readConnection.DisposeAsync();
+
+        await _writeConnection.CloseAsync();
+        await _writeConnection.DisposeAsync();
+
     }
 }
