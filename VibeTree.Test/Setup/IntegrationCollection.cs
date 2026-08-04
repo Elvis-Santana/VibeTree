@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VibeTree.Test;
+namespace VibeTree.Test.Setup;
 
 [CollectionDefinition(Name)]
 public class IntegrationCollection : ICollectionFixture<CustomWebApplicationFactory>

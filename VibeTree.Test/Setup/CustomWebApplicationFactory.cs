@@ -12,7 +12,7 @@ using VibeTree.Features.User.UpdateUser.Commands;
 using VibeTree.Shared.DbAppContext;
 using Wolverine;
 
-namespace VibeTree.Test;
+namespace VibeTree.Test.Setup;
 
 
 public class CustomWebApplicationFactory : WebApplicationFactory<global::Program>, IAsyncLifetime
