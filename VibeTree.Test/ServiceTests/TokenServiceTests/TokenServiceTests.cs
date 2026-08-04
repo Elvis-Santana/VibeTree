@@ -5,9 +5,9 @@ using System.IdentityModel.Tokens.Jwt;
 using VibeTree.Shared.Auth;
 using VibeTree.Shared.Entity;
 
-namespace VibeTree.Test.ServiceTest.TokenServiceTest;
+namespace VibeTree.Test.ServiceTests.TokenServiceTests;
 
-public class TokenServiceTest
+public class TokenServiceTests
 {
     private readonly Faker _userFaker = new("pt_BR");
 
